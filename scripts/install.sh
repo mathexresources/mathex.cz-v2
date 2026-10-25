@@ -2,6 +2,10 @@
 # Instalace / aktualizace webu na serveru s Dockerem (Raspberry Pi i jiný Linux).
 #   curl -fsSL https://raw.githubusercontent.com/mathexresources/mathex.cz-v2/main/scripts/install.sh | bash
 # Bezpečné spustit opakovaně: existující .env a data nepřepíše, jen stáhne novou verzi.
+#
+# Volitelně při první instalaci:
+#   SITE_URL=https://mathex.cz   adresa webu (výchozí http://<ip>:3000)
+#   WEB_BIND=127.0.0.1           jen lokálně, např. za Cloudflare Tunnelem (výchozí 0.0.0.0 = celá domácí síť)
 set -euo pipefail
 
 DIR="${MATHEX_DIR:-$HOME/mathex}"
@@ -33,11 +37,11 @@ if [ ! -f .env ]; then
   rnd() { openssl rand -hex "$1" 2>/dev/null || head -c "$1" /dev/urandom | od -An -tx1 | tr -d ' \n'; }
   cp .env.example .env
   sed -i \
-    -e "s|^SITE_URL=.*|SITE_URL=http://${ip:-localhost}:3000|" \
+    -e "s|^SITE_URL=.*|SITE_URL=${SITE_URL:-http://${ip:-localhost}:3000}|" \
     -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(rnd 24)|" \
     -e "s|^PAYLOAD_SECRET=.*|PAYLOAD_SECRET=$(rnd 32)|" \
     -e "s|^CALENDAR_FEED_TOKEN=.*|CALENDAR_FEED_TOKEN=$(rnd 24)|" \
-    -e "s|^WEB_BIND=.*|WEB_BIND=0.0.0.0|" \
+    -e "s|^WEB_BIND=.*|WEB_BIND=${WEB_BIND:-0.0.0.0}|" \
     .env
   chmod 600 .env
 else
@@ -55,7 +59,7 @@ say "Spouštím"
 $DOCKER compose $PROFILES up -d --remove-orphans
 
 say "Čekám, až web naběhne (první start nahrává databázi a obsah)"
-for i in $(seq 1 60); do
+for i in $(seq 1 100); do
   if curl -fsS http://127.0.0.1:3000/healthz >/dev/null 2>&1; then ok=1; break; fi
   sleep 3
 done
@@ -70,5 +74,5 @@ if [ "${ok:-}" = 1 ]; then
 else
   $DOCKER compose ps
   $DOCKER compose logs --tail 40 web
-  die "Web se do 3 minut nespustil – výpis logů je výše."
+  die "Web se do 5 minut nespustil – výpis logů je výše."
 fi

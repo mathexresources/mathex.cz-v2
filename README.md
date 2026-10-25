@@ -59,6 +59,20 @@ curl -fsSL https://raw.githubusercontent.com/mathexresources/mathex.cz-v2/main/s
 Skript zkontroluje systém, stáhne kód do `~/mathex`, vytvoří `.env` s náhodnými hesly, spustí web
 a vypíše adresu (např. `http://192.168.0.101:3000`). Stejný příkaz slouží i k aktualizaci.
 
+### Napojení na existující Cloudflare Tunnel (systémový `cloudflared`)
+
+Když na serveru už běží `cloudflared` jako služba s `/etc/cloudflared/config.yml`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mathexresources/mathex.cz-v2/main/scripts/install.sh \
+  | SITE_URL=https://mathex.cz WEB_BIND=127.0.0.1 bash
+sudo bash ~/mathex/scripts/cloudflared-add.sh http://localhost:3000 mathex.cz www.mathex.cz
+```
+
+Druhý skript přidá domény do tunelu (se zálohou a kontrolou konfigurace), restartuje `cloudflared`
+a nasměruje DNS. Pokud DNS nejde nastavit automaticky, vypíše, jaký CNAME přidat v Cloudflare.
+`www` web sám přesměruje na holou doménu.
+
 ### Ruční instalace
 
 ### 1. Stažení a nastavení
