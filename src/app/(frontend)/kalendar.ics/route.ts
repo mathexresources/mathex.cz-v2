@@ -1,5 +1,6 @@
 import { timingSafeEqual } from 'crypto'
 
+import { env } from '@/lib/env'
 import { buildCalendar } from '@/lib/ics'
 import { getPayloadClient } from '@/lib/payload'
 
@@ -30,7 +31,7 @@ export async function GET(req: Request) {
     sort: 'start',
     overrideAccess: true,
   })
-  const host = new URL(process.env.NEXT_PUBLIC_SITE_URL || req.url).hostname
+  const host = new URL(env.siteUrl || req.url).hostname
 
   const ics = buildCalendar(
     res.docs.map((b) => ({

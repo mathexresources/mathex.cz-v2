@@ -9,10 +9,9 @@ import { useEffect, useState } from 'react'
  * – čas otevření formuláře (robot odesílá okamžitě),
  * – volitelně Cloudflare Turnstile, pokud je nastavený klíč.
  */
-export function FormGuard() {
+export function FormGuard({ siteKey }: { siteKey?: string }) {
   const [startedAt, setStartedAt] = useState('')
   useEffect(() => setStartedAt(String(Date.now())), [])
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   return (
     <>

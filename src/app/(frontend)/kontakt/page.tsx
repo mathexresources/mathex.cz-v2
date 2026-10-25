@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ContactForm } from '@/components/forms/ContactForm'
 import { PageHeader } from '@/components/PageHeader'
 import { getSiteSettings } from '@/lib/data'
+import { env } from '@/lib/env'
 import { buildMetadata } from '@/lib/seo'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,7 +29,7 @@ export default async function ContactPage() {
       />
       <div className="container-site mt-14 grid gap-16 lg:grid-cols-[1fr_20rem]">
         <div className="max-w-3xl">
-          <ContactForm privacyHref="/ochrana-osobnich-udaju" source="/kontakt" />
+          <ContactForm privacyHref="/ochrana-osobnich-udaju" source="/kontakt" turnstileSiteKey={env.turnstileSiteKey} />
         </div>
 
         <aside className="ui space-y-8 lg:border-l lg:border-line lg:pl-8">

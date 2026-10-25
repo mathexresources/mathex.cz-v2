@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 
 import { renderEmail } from './email-template'
+import { env } from './env'
 import { buildCalendar, type IcsEvent } from './ics'
 import { formatDateTime } from './time'
 
@@ -18,7 +19,7 @@ type BookingDoc = {
   meetingType: string
 }
 
-const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const siteUrl = () => env.siteUrl
 
 async function context(payload: Payload) {
   const [site, booking] = await Promise.all([

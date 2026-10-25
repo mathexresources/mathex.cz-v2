@@ -42,49 +42,90 @@ Postavený na **Next.js 16** + **Payload CMS 3** (administrace běží ve stejn�
 - Honeypot, minimální doba vyplnění, omezení počtu odeslání z IP, volitelně Cloudflare Turnstile
 - Zachování vyplněných údajů při chybě, srozumitelné chybové hlášky
 
-## Nasazení na server (Docker)
+## Nasazení na Raspberry Pi
 
-Požadavky: Docker s Compose, reverzní proxy s HTTPS (Caddy, Nginx, Traefik…).
+Obraz se při každém pushi do `main` postaví na GitHubu pro amd64 i arm64 a nahraje se do
+`ghcr.io/mathexresources/mathex.cz-v2`. Pi ho jen stáhne – žádný build na Pi.
+
+**Požadavky:** Raspberry Pi 4 nebo 5 se 4 GB RAM a víc, 64bit systém (`uname -m` vypíše `aarch64`),
+Docker s Compose. Doporučuju SSD místo SD karty – databáze SD kartu časem opotřebuje.
+
+### 1. Stažení a nastavení
 
 ```bash
-git clone https://github.com/mathexresources/mathex.cz-v2.git
-cd mathex.cz-v2
+git clone https://github.com/mathexresources/mathex.cz-v2.git mathex && cd mathex
 cp .env.example .env
-# vyplň minimálně: NEXT_PUBLIC_SITE_URL, POSTGRES_PASSWORD, PAYLOAD_SECRET (openssl rand -hex 32)
-
-# 1) databáze + výchozí obsah a účet administrátora (migrace se spustí samy)
-docker compose up -d db
-ADMIN_EMAIL=ty@mathex.cz ADMIN_PASSWORD='silne-heslo' \
-  docker compose --profile tools run --rm -e ADMIN_EMAIL -e ADMIN_PASSWORD tools
-
-# 2) web
-docker compose up -d --build
+nano .env   # vyplň SITE_URL, POSTGRES_PASSWORD (openssl rand -hex 24), PAYLOAD_SECRET (openssl rand -hex 32)
 ```
 
-Seed spouštěj před prvním spuštěním webu. Kdyby se obsah nahraný mimo administraci na webu neprojevil, pomůže `docker compose up -d --force-recreate web` (vyčistí cache).
+### 2. Spuštění
 
-Web poslouchá na `127.0.0.1:3000`. Příklad pro **Caddy**:
-
-```
-mathex.cz, www.mathex.cz {
-  @www host www.mathex.cz
-  redir @www https://mathex.cz{uri} permanent
-  encode zstd gzip
-  reverse_proxy 127.0.0.1:3000
-}
+```bash
+docker compose pull
+docker compose up -d
 ```
 
-Aktualizace webu: `git pull && docker compose up -d --build`.
-Zálohy: databáze (`docker compose exec db pg_dump -U mathex mathex > zaloha.sql`) a svazek `media`.
+Při prvním startu se sama vytvoří databáze a nahraje výchozí obsah. Pak otevři `http://<ip-pi>:3000/admin`
+(nebo `http://raspberrypi.local:3000/admin`) a založ si účet administrátora.
+Port 3000 je dostupný jen z Pi samotného – z jiného počítače se připoj přes SSH tunel
+`ssh -L 3000:localhost:3000 pi@raspberrypi.local`, nebo pokračuj krokem 3.
+
+### 3. Zveřejnění webu bez otevírání portů (Cloudflare Tunnel)
+
+Domácí připojení často nemá veřejnou IP a otevírat porty na routeru není bezpečné.
+Cloudflare Tunnel to řeší zdarma a skryje i tvoji domácí IP adresu.
+
+1. Doménu přidej do Cloudflare (stačí bezplatný plán) a u registrátora přepni DNS servery na Cloudflare.
+2. V Cloudflare: **Zero Trust → Networks → Tunnels → Create a tunnel → Cloudflared**, pojmenuj ho a zkopíruj token do `.env` jako `CLOUDFLARE_TUNNEL_TOKEN`.
+3. V tunelu přidej **Public Hostname**: doména `tvoje-domena.cz`, služba `HTTP`, URL `web:3000`. Totéž pro `www`.
+4. Spusť:
+
+```bash
+docker compose --profile tunnel up -d
+```
+
+HTTPS i certifikáty řeší Cloudflare. Nezapomeň v `.env` nastavit `SITE_URL=https://tvoje-domena.cz`
+a restartovat web: `docker compose up -d web`.
+
+### Aktualizace
+
+```bash
+git pull                       # jen když se změnil docker-compose.yml nebo .env.example
+docker compose pull && docker compose --profile tunnel up -d
+docker image prune -f          # smaže staré verze obrazu
+```
+
+### Zálohy
+
+Služba `backup` každý den uloží databázi do složky `./backups` (drží 14 dní).
+Nahrané obrázky jsou ve svazku `media`. Obnova databáze:
+
+```bash
+gunzip -c backups/db-2026-10-25.sql.gz | docker compose exec -T db psql -U mathex mathex
+```
+
+Zálohy kopíruj i mimo Pi (jiný disk, cloud) – když odejde disk, odejdou i zálohy.
+
+### Užitečné příkazy
+
+```bash
+docker compose ps              # stav služeb (web má kontrolu stavu na /healthz)
+docker compose logs -f web     # logy webu, tady uvidíš i e-maily, dokud nenastavíš SMTP
+docker compose restart web
+```
+
+### Build přímo na serveru
+
+Když nechceš používat obraz z GitHubu: `docker compose build web && docker compose up -d`.
+Na Pi 4 to trvá zhruba 10–20 minut a potřebuje aspoň 4 GB RAM.
 
 ## Lokální vývoj
 
 ```bash
-cp .env.example .env    # DATABASE_URI na lokální Postgres
-docker compose up -d db # nebo vlastní Postgres
+cp .env.example .env    # + DATABASE_URI=postgres://mathex:heslo@localhost:5432/mathex
+# potřebuješ běžící PostgreSQL (lokálně nebo v Dockeru s publikovaným portem 5432)
 npm install
 npm run dev             # http://localhost:3000, administrace na /admin
-npm run seed            # výchozí obsah
 ```
 
 Po změně kolekcí nebo polí:

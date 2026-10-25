@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 
 import type { Media } from '@/payload-types'
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
+import { env } from './env'
+
+export const SITE_URL = env.siteUrl
 
 export const absoluteUrl = (path = '/') => (path.startsWith('http') ? path : `${SITE_URL}${path}`)
 

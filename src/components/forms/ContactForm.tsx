@@ -9,7 +9,15 @@ import { FormGuard } from './FormGuard'
 
 const initial: ContactState = { status: 'idle' }
 
-export function ContactForm({ privacyHref, source }: { privacyHref: string; source: string }) {
+export function ContactForm({
+  privacyHref,
+  source,
+  turnstileSiteKey,
+}: {
+  privacyHref: string
+  source: string
+  turnstileSiteKey?: string
+}) {
   const [state, action, pending] = useActionState(sendInquiry, initial)
   const v = state.values ?? {}
 
@@ -42,7 +50,7 @@ export function ContactForm({ privacyHref, source }: { privacyHref: string; sour
       />
       <input type="hidden" name="source" value={source} />
       <Consent privacyHref={privacyHref} error={state.errors?.consent} />
-      <FormGuard />
+      <FormGuard siteKey={turnstileSiteKey} />
 
       {state.status === 'error' && state.message && (
         <p role="alert" className="field-error text-[1rem]">

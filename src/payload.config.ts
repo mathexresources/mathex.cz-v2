@@ -26,12 +26,14 @@ import { AboutPage } from './globals/AboutPage'
 import { BookingSettings } from './globals/BookingSettings'
 import { HomePage } from './globals/HomePage'
 import { SiteSettings } from './globals/SiteSettings'
+import { env } from './lib/env'
 import { migrations } from './migrations'
+import { seedIfEmpty } from './seed/content'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const siteUrl = env.siteUrl
 
 const urlFor = (collection: string | undefined, slug: string | undefined) => {
   if (!slug) return siteUrl
@@ -98,6 +100,15 @@ export default buildConfig({
       })
     : undefined,
   sharp,
+  // Při prvním startu s prázdnou databází nahraje výchozí obsah (vypnutí: SEED_ON_EMPTY=false)
+  onInit: async (payload) => {
+    if (process.env.SEED_ON_EMPTY === 'false') return
+    try {
+      await seedIfEmpty(payload)
+    } catch (err) {
+      payload.logger.error({ err }, '[seed] Výchozí obsah se nepodařilo nahrát')
+    }
+  },
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

@@ -37,10 +37,12 @@ export function BookingWidget({
   types,
   privacyHref,
   initialMessage,
+  turnstileSiteKey,
 }: {
   types: MeetingTypeOption[]
   privacyHref: string
   initialMessage?: string
+  turnstileSiteKey?: string
 }) {
   const [typeIndex, setTypeIndex] = useState(0)
   const [days, setDays] = useState<DaySlots[] | null>(null)
@@ -205,7 +207,7 @@ export function BookingWidget({
           hint="Stačí pár vět. Pomůže mi to připravit se."
         />
         <Consent privacyHref={privacyHref} error={state.errors?.consent} />
-        <FormGuard />
+        <FormGuard siteKey={turnstileSiteKey} />
       </fieldset>
 
       {state.status === 'error' && state.message && (

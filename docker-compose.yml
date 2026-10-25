@@ -1,3 +1,16 @@
+# Nasazení (Raspberry Pi i jakýkoli server s Dockerem)
+#
+#   docker compose pull && docker compose up -d                     # web + databáze + zálohy
+#   docker compose --profile tunnel up -d                            # + Cloudflare Tunnel
+#
+# Obraz se staví automaticky na GitHubu (amd64 i arm64), Pi ho jen stahuje.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
 services:
   db:
     image: postgres:16-alpine
@@ -6,24 +19,22 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-mathex}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Nastav POSTGRES_PASSWORD v .env}
       POSTGRES_DB: ${POSTGRES_DB:-mathex}
+    # Šetrnější nastavení pro Raspberry Pi
+    command: ['postgres', '-c', 'shared_buffers=128MB', '-c', 'max_connections=30', '-c', 'effective_cache_size=512MB']
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 10
+    mem_limit: 512m
+    logging: *logging
 
   web:
-    build:
-      context: .
-      args:
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://mathex.cz}
-        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
-        NEXT_PUBLIC_PLAUSIBLE_DOMAIN: ${NEXT_PUBLIC_PLAUSIBLE_DOMAIN:-}
-        NEXT_PUBLIC_PLAUSIBLE_SRC: ${NEXT_PUBLIC_PLAUSIBLE_SRC:-https://plausible.io/js/script.js}
-        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
-        NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
+    image: ${WEB_IMAGE:-ghcr.io/mathexresources/mathex.cz-v2:latest}
+    # Kdybys chtěl stavět přímo na serveru: docker compose build web
+    build: .
     restart: unless-stopped
     depends_on:
       db:
@@ -31,32 +42,53 @@ services:
     env_file: .env
     environment:
       DATABASE_URI: postgres://${POSTGRES_USER:-mathex}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mathex}
+      NODE_OPTIONS: --max-old-space-size=512
     volumes:
       - media:/app/media
-    # Web poslouchá jen lokálně – před něj dej svůj reverzní proxy (Caddy, Nginx, Traefik) s HTTPS.
+    # Jen lokálně – ven web pouští Cloudflare Tunnel nebo tvoje reverzní proxy
     ports:
       - '127.0.0.1:3000:3000'
+    mem_limit: 1g
+    logging: *logging
 
-  # Jednorázové nástroje: `docker compose --profile tools run --rm tools npm run seed`
-  tools:
-    profiles: ['tools']
-    build:
-      context: .
-      target: builder
-    env_file: .env
-    environment:
-      DATABASE_URI: postgres://${POSTGRES_USER:-mathex}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mathex}
-      MEDIA_DIR: /app/media
-      # produkční režim = Payload nemění schéma databáze sám, jen přes migrace
-      NODE_ENV: production
+  # Denní záloha databáze do ./backups (drží posledních 14 dní)
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-mathex}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-mathex}
     volumes:
-      - media:/app/media
-      # aby `migrate:create` zapsal migrace přímo do repozitáře
-      - ./src/migrations:/app/src/migrations
-    command: ['npm', 'run', 'seed']
+      - ./backups:/backups
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        while true; do
+          f=/backups/db-$$(date +%Y-%m-%d).sql.gz
+          pg_dump --no-owner | gzip > "$$f.tmp" && mv "$$f.tmp" "$$f" && echo "Záloha: $$f"
+          find /backups -name 'db-*.sql.gz' -mtime +14 -delete
+          sleep 86400
+        done
+    mem_limit: 128m
+    logging: *logging
+
+  # Zveřejnění webu bez otevírání portů na routeru (zapni: --profile tunnel)
+  cloudflared:
+    profiles: ['tunnel']
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: ['tunnel', '--no-autoupdate', 'run']
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?Nastav CLOUDFLARE_TUNNEL_TOKEN v .env}
+    depends_on:
+      - web
+    mem_limit: 128m
+    logging: *logging
 
 volumes:
   db-data:

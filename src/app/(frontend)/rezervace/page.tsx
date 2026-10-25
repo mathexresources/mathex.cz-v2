@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { BookingWidget, type MeetingTypeOption } from '@/components/forms/BookingWidget'
 import { PageHeader } from '@/components/PageHeader'
 import { getBookingSettings, getSiteSettings } from '@/lib/data'
+import { env } from '@/lib/env'
 import { buildMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = buildMetadata({
@@ -37,6 +38,7 @@ export default async function BookingPage({ searchParams }: Props) {
             <BookingWidget
               types={types}
               privacyHref="/ochrana-osobnich-udaju"
+              turnstileSiteKey={env.turnstileSiteKey}
               initialMessage={pkg ? `Zajímá mě balíček ${pkg}.` : undefined}
             />
           ) : (

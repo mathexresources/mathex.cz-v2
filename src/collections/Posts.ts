@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isLoggedIn, publishedOrLoggedIn } from '@/access'
 import { slugField } from '@/fields/slug'
 import { revalidateHooks } from '@/hooks/revalidate'
+import { env } from '@/lib/env'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -12,7 +13,7 @@ export const Posts: CollectionConfig = {
     defaultColumns: ['title', 'category', 'publishedAt', '_status'],
     group: 'Blog',
     preview: (doc) =>
-      doc?.slug ? `${process.env.NEXT_PUBLIC_SITE_URL || ''}/blog/${doc.slug}` : null,
+      doc?.slug ? `${env.siteUrl}/blog/${doc.slug}` : null,
   },
   access: {
     read: publishedOrLoggedIn,

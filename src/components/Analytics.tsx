@@ -1,20 +1,22 @@
 import Script from 'next/script'
 
+import { env } from '@/lib/env'
+
 /**
  * Analytika bez cookies (Plausible nebo Umami) – nevyžaduje cookie lištu.
  * Zapíná se proměnnými prostředí, viz .env.example.
  */
 export function Analytics() {
-  const plausible = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
-  const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
-  const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC
+  const plausible = env.plausibleDomain
+  const umamiId = env.umamiWebsiteId
+  const umamiSrc = env.umamiSrc
 
   if (plausible) {
     return (
       <Script
         defer
         data-domain={plausible}
-        src={process.env.NEXT_PUBLIC_PLAUSIBLE_SRC || 'https://plausible.io/js/script.js'}
+        src={env.plausibleSrc}
         strategy="afterInteractive"
       />
     )
