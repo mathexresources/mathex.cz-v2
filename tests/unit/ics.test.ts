@@ -49,4 +49,10 @@ describe('.ics', () => {
     expect(text.includes('\r\n')).toBe(true)
     expect(text.replace(/\r\n/g, '').includes('\n')).toBe(false)
   })
+
+  it('událost pro CalDAV nemá METHOD (RFC 4791)', () => {
+    const text = buildCalendar([event], { method: null })
+    expect(text).not.toContain('METHOD:')
+    expect(text).toContain('BEGIN:VEVENT')
+  })
 })

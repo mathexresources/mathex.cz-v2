@@ -53,3 +53,22 @@ export async function asNewVisitor(page: Page) {
 }
 
 export const ADMIN = { email: 'admin@mathex.test', password: 'E2e-Heslo-123456', name: 'Test Admin' }
+
+/** Přihlásí administrátora (a při prvním volání ho založí). Vrací JWT token. */
+export async function adminToken(request: import('@playwright/test').APIRequestContext): Promise<string> {
+  const login = await request.post('/api/users/login', { data: { email: ADMIN.email, password: ADMIN.password } })
+  if (login.ok()) return (await login.json()).token
+  const reg = await request.post('/api/users/first-register', { data: ADMIN })
+  if (!reg.ok()) throw new Error(`Nepodařilo se založit administrátora: ${await reg.text()}`)
+  const again = await request.post('/api/users/login', { data: { email: ADMIN.email, password: ADMIN.password } })
+  return (await again.json()).token
+}
+
+export async function calendarDays(): Promise<{ workDay: string; privateDay: string; weeklyDay: string; onceDay: string }> {
+  return (await fetch(`${HELPER}/calendar-days`)).json()
+}
+
+/** Obsah kalendáře v testovacím CalDAV serveru (Radicale). */
+export async function caldavCalendar(slug: string): Promise<string> {
+  return (await fetch(`${HELPER}/caldav/${slug}`)).text()
+}

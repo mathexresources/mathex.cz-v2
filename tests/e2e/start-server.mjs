@@ -9,7 +9,7 @@
  * Obsazený den:       GET        http://127.0.0.1:2526/busy-day
  */
 import { spawn } from 'node:child_process'
-import { existsSync, mkdtempSync } from 'node:fs'
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import http from 'node:http'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -103,10 +103,97 @@ http
       return res.end(busyIcs)
     }
     if (req.url === '/busy-day') return res.end(busyKey)
+    if (req.url === '/calendar-days') {
+      res.setHeader('Content-Type', 'application/json')
+      return res.end(JSON.stringify({ workDay, privateDay, weeklyDay, onceDay }))
+    }
+    if (req.url?.startsWith('/caldav/')) {
+      // obsah kalendáře v CalDAV serveru (pro kontrolu, co web zapsal)
+      return fetch(`${CALDAV}/test/${req.url.slice('/caldav/'.length)}/`, { headers: { Authorization: AUTH } })
+        .then((r) => r.text())
+        .then((t) => res.end(t))
+    }
     res.statusCode = 404
     res.end()
   })
   .listen(HELPER_PORT, '127.0.0.1')
+
+// ---------- 3b. CalDAV server (Radicale) – náhrada za iCloud ----------
+// Tři kalendáře: „Práce“ (blokuje), „Soukromé“ (záměrně neblokuje), „Rezervace“ (sem se zapisují rezervace)
+const CALDAV_PORT = 5232
+const caldavDir = mkdtempSync(path.join(tmpdir(), 'mathex-caldav-'))
+writeFileSync(path.join(caldavDir, 'users'), 'test:test\n')
+const radicale = spawn(
+  process.env.RADICALE_PYTHON || 'python3',
+  [
+    '-m', 'radicale',
+    '--server-hosts', `127.0.0.1:${CALDAV_PORT}`,
+    '--storage-filesystem-folder', path.join(caldavDir, 'data'),
+    '--auth-type', 'htpasswd',
+    '--auth-htpasswd-filename', path.join(caldavDir, 'users'),
+    '--auth-htpasswd-encryption', 'plain',
+    '--logging-level', 'warning',
+  ],
+  { stdio: ['ignore', 'inherit', 'inherit'] },
+)
+const CALDAV = `http://127.0.0.1:${CALDAV_PORT}`
+const AUTH = 'Basic ' + Buffer.from('test:test').toString('base64')
+for (let i = 0; i < 50; i++) {
+  try {
+    await fetch(CALDAV + '/')
+    break
+  } catch {
+    await new Promise((r) => setTimeout(r, 200))
+  }
+}
+async function dav(method, url, body, headers = {}) {
+  const res = await fetch(CALDAV + url, { method, body, headers: { Authorization: AUTH, ...headers } })
+  if (res.status >= 400) throw new Error(`${method} ${url} → ${res.status} ${await res.text()}`)
+  return res
+}
+const mkcal = (slug, name) =>
+  dav(
+    'MKCOL',
+    `/test/${slug}/`,
+    `<?xml version="1.0"?><D:mkcol xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav"><D:set><D:prop>` +
+      `<D:resourcetype><D:collection/><C:calendar/></D:resourcetype><D:displayname>${name}</D:displayname>` +
+      `<C:supported-calendar-component-set><C:comp name="VEVENT"/></C:supported-calendar-component-set>` +
+      `</D:prop></D:set></D:mkcol>`,
+    { 'Content-Type': 'application/xml' },
+  )
+await dav('PROPFIND', '/test/', undefined, { Depth: '0' }) // založí uživatele
+await mkcal('prace', 'Práce')
+await mkcal('soukrome', 'Soukromé')
+await mkcal('rezervace', 'Rezervace')
+
+// Dny pro testy kalendáře: 4 různé pracovní dny od +3 dnů, mimo den z falešného iCal
+const days = []
+for (let d = new Date(Date.now() + 3 * 86400000); days.length < 4; d = new Date(d.getTime() + 86400000)) {
+  const key = pragueKey(d)
+  const wd = new Date(`${key}T12:00:00Z`).getUTCDay()
+  if (wd === 0 || wd === 6 || key === busyKey) continue
+  days.push(key)
+}
+const [workDay, privateDay, weeklyDay, onceDay] = days
+const putEvent = (cal, uid, key, from, to, summary) =>
+  dav(
+    'PUT',
+    `/test/${cal}/${uid}.ics`,
+    [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//E2E//EN',
+      'BEGIN:VTIMEZONE', 'TZID:Europe/Prague',
+      'BEGIN:STANDARD', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'END:STANDARD',
+      'BEGIN:DAYLIGHT', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'END:DAYLIGHT',
+      'END:VTIMEZONE',
+      'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:20260101T000000Z`,
+      `DTSTART;TZID=Europe/Prague:${stamp(key, from)}`, `DTEND;TZID=Europe/Prague:${stamp(key, to)}`,
+      `SUMMARY:${summary}`, 'END:VEVENT', 'END:VCALENDAR',
+    ].join('\r\n'),
+    { 'Content-Type': 'text/calendar; charset=utf-8' },
+  )
+await putEvent('prace', 'e2e-prace', workDay, '0900', '1200', 'Porada')
+await putEvent('soukrome', 'e2e-soukrome', privateDay, '0800', '1800', 'Soukromé – nemá blokovat')
+console.log(`[e2e] CalDAV na ${CALDAV}, dny: ${days.join(', ')}`)
 
 // ---------- 4. web ----------
 const server = path.join(ROOT, '.next/standalone/server.js')
@@ -132,6 +219,9 @@ const child = spawn(process.execPath, [server], {
     SMTP_FROM_ADDRESS: 'web@mathex.test',
     SMTP_FROM_NAME: 'Mathex test',
     BUSY_CALENDAR_ICS_URL: `http://127.0.0.1:${HELPER_PORT}/busy.ics`,
+    CALDAV_URL: `${CALDAV}/`,
+    CALDAV_USERNAME: 'test',
+    CALDAV_PASSWORD: 'test',
     CALENDAR_FEED_TOKEN: 'e2e-feed-token-0123456789',
     MEDIA_DIR: mkdtempSync(path.join(tmpdir(), 'mathex-media-')),
     TURNSTILE_SITE_KEY: '',
@@ -140,6 +230,7 @@ const child = spawn(process.execPath, [server], {
 })
 const stop = () => {
   child.kill('SIGTERM')
+  radicale.kill('SIGTERM')
   smtp.close()
   process.exit(0)
 }

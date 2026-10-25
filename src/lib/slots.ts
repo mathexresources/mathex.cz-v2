@@ -17,6 +17,43 @@ export type SlotSettings = {
   maxDaysAhead?: number | null
   maxPerDay?: number | null
   blackouts?: { from: string; to: string }[] | null
+  /** Pevně blokované časy: každý týden ve stejný den, nebo jednorázově v konkrétní den. */
+  blockedTimes?: BlockedTime[] | null
+}
+
+export type BlockedTime = {
+  repeat: 'weekly' | 'once'
+  /** 0 = neděle … 6 = sobota (pro repeat = weekly) */
+  day?: string | number | null
+  /** datum (pro repeat = once); stačí YYYY-MM-DD nebo ISO */
+  date?: string | null
+  from: string
+  to: string
+}
+
+/** Blokace platné pro daný den jako intervaly v UTC. */
+export function blockedIntervalsForDay(key: string, blocked: BlockedTime[] | null | undefined): Interval[] {
+  if (!blocked?.length) return []
+  const weekday = String(weekdayOfKey(key))
+  const { year, month, day } = parseKey(key)
+  const out: Interval[] = []
+  for (const b of blocked) {
+    const applies =
+      b.repeat === 'weekly'
+        ? String(b.day) === weekday
+        : b.repeat === 'once' && b.date
+          ? (b.date.length === 10 ? b.date : dateKey(new Date(b.date))) === key
+          : false
+    if (!applies || !b.from || !b.to) continue
+    const from = minutesFromHHMM(b.from)
+    const to = minutesFromHHMM(b.to)
+    if (!(to > from)) continue
+    out.push({
+      start: zonedToUtc(year, month, day, Math.floor(from / 60), from % 60),
+      end: zonedToUtc(year, month, day, Math.floor(to / 60), to % 60),
+    })
+  }
+  return out
 }
 
 export type DaySlots = { date: string; slots: string[] }
@@ -70,6 +107,7 @@ export function computeSlots(args: {
 
     const { year, month, day } = parseKey(key)
     const slots = new Set<string>()
+    const blockedToday = blockedIntervalsForDay(key, settings.blockedTimes)
 
     for (const w of windows) {
       const from = minutesFromHHMM(w.from)
@@ -79,6 +117,8 @@ export function computeSlots(args: {
         if (start.getTime() < earliest) continue
         const slot = { start, end: new Date(start.getTime() + durationMin * 60000) }
         if (taken.some((t) => overlaps(slot, t, bufferMs))) continue
+        // Pevná blokace se počítá bez pauzy – je to tvůj čas, ne schůzka
+        if (blockedToday.some((t) => overlaps(slot, t, 0))) continue
         slots.add(start.toISOString())
       }
     }

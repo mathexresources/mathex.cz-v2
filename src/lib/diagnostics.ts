@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer'
 import type { Payload } from 'payload'
 
-import { getBusyIntervals, resetBusyCache } from './busy-calendar'
+import { getBusyIntervals, resetBusyCache, type SourceReport } from './busy-calendar'
+import { caldavConfigured, listCalendars, parseNames } from './caldav'
 import { renderEmail } from './email-template'
 import { env } from './env'
 import { formatDateTime } from './time'
@@ -49,26 +50,82 @@ async function checkSmtp(): Promise<Check> {
   }
 }
 
-async function checkBusyCalendar(): Promise<Check> {
-  const base = { id: 'calendar', label: 'Obsazenost z Google Kalendáře' }
-  if (!process.env.BUSY_CALENDAR_ICS_URL) {
-    return {
-      ...base,
+async function checkCalendars(payload: Payload): Promise<Check[]> {
+  const settings = await payload.findGlobal({ slug: 'booking-settings', depth: 0, overrideAccess: true })
+  const busyNames = parseNames(settings.calendar?.busyCalendars)
+  const bookingCalendar = (settings.calendar?.bookingCalendar ?? '').trim()
+  const icsUrls = (settings.icsUrls ?? []).map((c) => c.url).filter(Boolean)
+  const checks: Check[] = []
+
+  // --- iCloud / CalDAV ---
+  const caldav = { id: 'caldav', label: 'Kalendář v iPhonu (iCloud)' }
+  if (!caldavConfigured()) {
+    checks.push({
+      ...caldav,
       status: 'off',
-      detail: 'Nepoužívá se. Rezervace vidí jen schůzky zadané přes web.',
-      help: 'Do BUSY_CALENDAR_ICS_URL vlož tajnou iCal adresu svého Google Kalendáře.',
+      detail: 'Nepřipojený. Volné termíny se počítají jen z pracovní doby, blokací a rezervací z webu.',
+      help: 'Do .env na serveru dej CALDAV_USERNAME (Apple ID) a CALDAV_PASSWORD (heslo pro aplikace z appleid.apple.com), pak restartuj web.',
+    })
+  } else {
+    try {
+      const calendars = await listCalendars(true)
+      const names = calendars.map((c) => c.name)
+      const missingBusy = (busyNames ?? []).filter((n) => !names.some((x) => x.localeCompare(n, 'cs', { sensitivity: 'base' }) === 0))
+      const bookingOk = !bookingCalendar || names.some((x) => x.localeCompare(bookingCalendar, 'cs', { sensitivity: 'base' }) === 0)
+      resetBusyCache()
+      const now = new Date()
+      const report: SourceReport[] = []
+      await getBusyIntervals(now, new Date(now.getTime() + 30 * 86400000), {
+        sources: { caldavCalendars: missingBusy.length ? null : busyNames },
+        report,
+      })
+      const busyCount = report.find((r) => r.source === 'caldav')?.count ?? 0
+      const problems = [
+        missingBusy.length ? `Nenalezené kalendáře: ${missingBusy.join(', ')}.` : '',
+        bookingOk ? '' : `Kalendář pro rezervace „${bookingCalendar}“ neexistuje.`,
+      ].filter(Boolean)
+      checks.push({
+        ...caldav,
+        status: problems.length ? 'error' : bookingCalendar ? 'ok' : 'warn',
+        detail: [
+          `Připojeno. Kalendáře: ${names.join(', ') || 'žádné'}.`,
+          `Termíny blokuje: ${busyNames ? busyNames.join(', ') : 'všechny'} – v příštích 30 dnech ${busyCount} obsazených bloků.`,
+          bookingCalendar ? `Rezervace se zapisují do „${bookingCalendar}“.` : 'Rezervace se do iCloudu zatím nezapisují.',
+          ...problems,
+        ].join(' '),
+        help: problems.length
+          ? 'Oprav názvy v Nastavení rezervací → Kalendář v iPhonu (musí přesně odpovídat názvům v iPhonu).'
+          : bookingCalendar
+            ? undefined
+            : 'V Nastavení rezervací vyplň „Do kterého kalendáře zapisovat rezervace“.',
+      })
+    } catch (err) {
+      checks.push({ ...caldav, status: 'error', detail: (err as Error).message })
     }
   }
-  resetBusyCache()
-  const now = new Date()
-  const result = await getBusyIntervals(now, new Date(now.getTime() + 30 * 86400000), { throwOnError: true }).then(
-    (items) => ({ items }),
-    (err: Error) => ({ error: err.message }),
-  )
-  if ('error' in result) {
-    return { ...base, status: 'error', detail: `Kalendář se nepodařilo načíst: ${result.error}`, help: 'Zkontroluj, že je adresa celá a kalendář existuje.' }
+
+  // --- kalendáře podle adresy ---
+  const ics = { id: 'calendar', label: 'Kalendáře podle adresy (iCal)' }
+  const allUrls = [...icsUrls, ...(process.env.BUSY_CALENDAR_ICS_URL ? [process.env.BUSY_CALENDAR_ICS_URL] : [])]
+  if (!allUrls.length) {
+    checks.push({ ...ics, status: 'off', detail: 'Žádné. Můžeš přidat např. Google Kalendář v Nastavení rezervací.' })
+  } else {
+    resetBusyCache()
+    const now = new Date()
+    const report: SourceReport[] = []
+    await getBusyIntervals(now, new Date(now.getTime() + 30 * 86400000), { sources: { icsUrls }, report })
+    const bad = report.filter((r) => !r.ok)
+    const total = report.reduce((a, r) => a + r.count, 0)
+    checks.push({
+      ...ics,
+      status: bad.length ? 'error' : 'ok',
+      detail: bad.length
+        ? `Kalendář se nepodařilo načíst: ${bad.map((b) => b.error).join('; ')}`
+        : `Načteno ${report.length} ${report.length === 1 ? 'kalendář' : 'kalendáře'}. V příštích 30 dnech ${total} obsazených bloků, které se v rezervacích nenabídnou.`,
+      help: bad.length ? 'Zkontroluj, že je adresa celá a kalendář existuje.' : undefined,
+    })
   }
-  return { ...base, status: 'ok', detail: `Načteno. V příštích 30 dnech ${result.items.length} obsazených bloků, které se v rezervacích nenabídnou.` }
+  return checks
 }
 
 function checkTurnstile(): Check {
@@ -121,18 +178,24 @@ function checkCalendarFeed(): Check {
   return {
     ...base,
     status: 'ok',
-    detail: 'Adresu pro Google Kalendář („Přidat podle URL“) najdeš níže.',
+    detail: 'Odkazy pro přidání do iPhonu a Google Kalendáře najdeš níže.',
   }
 }
 
-export async function runDiagnostics(): Promise<Check[]> {
-  const [smtp, calendar] = await Promise.all([checkSmtp(), checkBusyCalendar()])
-  return [checkSiteUrl(), smtp, calendar, checkCalendarFeed(), checkTurnstile(), checkAnalytics()]
+export async function runDiagnostics(payload: Payload): Promise<Check[]> {
+  const [smtp, calendars] = await Promise.all([checkSmtp(), checkCalendars(payload)])
+  return [checkSiteUrl(), smtp, ...calendars, checkCalendarFeed(), checkTurnstile(), checkAnalytics()]
 }
 
 export function calendarFeedUrl() {
   const token = process.env.CALENDAR_FEED_TOKEN
   return token ? `${env.siteUrl}/kalendar.ics?token=${encodeURIComponent(token)}` : null
+}
+
+/** webcal:// odkaz – na iPhonu otevře rovnou „Přidat odebíraný kalendář“. */
+export function calendarFeedWebcal() {
+  const url = calendarFeedUrl()
+  return url ? url.replace(/^https?:\/\//, 'webcal://') : null
 }
 
 /** Odešle zkušební e-mail přes stejnou cestu jako potvrzení rezervací. */

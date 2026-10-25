@@ -1,7 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
 import { isLoggedIn } from '@/access'
+import { addBookingToCalendar, removeBookingFromCalendar } from '@/lib/booking-calendar'
 import { sendCancellationEmail } from '@/lib/booking-emails'
+import { resetBusyCache } from '@/lib/busy-calendar'
 
 export const BOOKING_STATUSES = [
   { value: 'confirmed', label: 'Potvrzeno' },
@@ -30,13 +32,50 @@ export const Bookings: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ doc, previousDoc, operation, req, context }) => {
-        if (
-          operation === 'update' &&
-          !context?.skipNotify &&
-          previousDoc?.status !== 'cancelled' &&
-          doc.status === 'cancelled'
-        ) {
-          await sendCancellationEmail(req.payload, doc, 'admin')
+        if (context?.skipCalendar) return doc
+        // Rezervace mění obsazenost – další návštěvník musí vidět aktuální stav
+        resetBusyCache()
+        const log = (msg: string, err: unknown) =>
+          req.payload.logger.error(`[kalendář] ${msg}: ${err instanceof Error ? err.message : String(err)}`)
+
+        // Nová (nezrušená) rezervace → zapsat do kalendáře v iPhonu
+        if (operation === 'create' && doc.status !== 'cancelled') {
+          try {
+            const url = await addBookingToCalendar(req.payload, doc)
+            if (url) {
+              await req.payload.update({
+                collection: 'bookings',
+                id: doc.id,
+                data: { calendarEventUrl: url },
+                overrideAccess: true,
+                req,
+                context: { skipCalendar: true, skipNotify: true },
+              })
+              doc.calendarEventUrl = url
+            }
+          } catch (err) {
+            log('Rezervaci se nepodařilo zapsat do kalendáře', err)
+          }
+        }
+
+        // Zrušení (klientem i v administraci) → smazat z kalendáře
+        if (operation === 'update' && previousDoc?.status !== 'cancelled' && doc.status === 'cancelled') {
+          try {
+            await removeBookingFromCalendar(previousDoc?.calendarEventUrl ? previousDoc : doc)
+          } catch (err) {
+            log('Rezervaci se nepodařilo smazat z kalendáře', err)
+          }
+          if (!context?.skipNotify) await sendCancellationEmail(req.payload, doc, 'admin')
+        }
+        return doc
+      },
+    ],
+    afterDelete: [
+      async ({ doc, req }) => {
+        try {
+          await removeBookingFromCalendar(doc)
+        } catch (err) {
+          req.payload.logger.error(`[kalendář] Smazanou rezervaci se nepodařilo odebrat z kalendáře: ${String(err)}`)
         }
         return doc
       },
@@ -101,6 +140,17 @@ export const Bookings: CollectionConfig = {
       index: true,
       admin: { hidden: true },
       access: { read: () => false, update: () => false },
+    },
+    {
+      name: 'calendarEventUrl',
+      label: 'Událost v kalendáři',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Vyplní se, když se rezervace zapíše do kalendáře v iPhonu.',
+        condition: (data) => Boolean(data?.calendarEventUrl),
+      },
     },
     {
       name: 'consent',

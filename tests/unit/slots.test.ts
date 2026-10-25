@@ -91,3 +91,55 @@ describe('volné termíny', () => {
     expect(r.map((d) => d.date)).toEqual(['2026-10-26'])
   })
 })
+
+describe('pevně blokované časy', () => {
+  it('každý týden: blokuje daný den v týdnu, ostatní dny ne', () => {
+    const r = computeSlots({
+      settings: { ...base, blockedTimes: [{ repeat: 'weekly', day: '1', from: '09:00', to: '10:30' }] },
+      durationMin: 30,
+      bookings: [],
+      busy: [],
+      now: NOW,
+    })
+    // pondělí 26. 10.: 9:00–10:30 pryč, 10:30 a 11:00 zůstávají
+    expect(slotsOn(r, '2026-10-26')).toEqual([iso('2026-10-26T09:30:00Z'), iso('2026-10-26T10:00:00Z'), iso('2026-10-26T10:30:00Z')])
+    // a další pondělí 2. 11. také
+    expect(slotsOn(r, '2026-11-02')).toHaveLength(3)
+    // úterý nedotčené
+    expect(slotsOn(r, '2026-10-27')).toHaveLength(6)
+  })
+
+  it('jednou: blokuje jen konkrétní datum (i když přijde jako ISO z administrace)', () => {
+    const r = computeSlots({
+      settings: {
+        ...base,
+        blockedTimes: [{ repeat: 'once', date: '2026-10-26T23:00:00.000Z', from: '10:00', to: '12:00' }], // = 27. 10. v Praze
+      },
+      durationMin: 30,
+      bookings: [],
+      busy: [],
+      now: NOW,
+    })
+    expect(slotsOn(r, '2026-10-27')).toEqual([iso('2026-10-27T08:00:00Z'), iso('2026-10-27T08:30:00Z')])
+    expect(slotsOn(r, '2026-10-26')).toHaveLength(6)
+  })
+
+  it('blokace nepřidává pauzu mezi schůzkami a ignoruje neplatné řádky', () => {
+    const r = computeSlots({
+      settings: {
+        ...base,
+        bufferMin: 30,
+        blockedTimes: [
+          { repeat: 'weekly', day: '1', from: '11:00', to: '12:00' },
+          { repeat: 'weekly', day: '1', from: '12:00', to: '11:00' }, // obrácený čas → ignorovat
+          { repeat: 'once', from: '09:00', to: '12:00' }, // bez data → ignorovat
+        ],
+      },
+      durationMin: 30,
+      bookings: [],
+      busy: [],
+      now: NOW,
+    })
+    expect(slotsOn(r, '2026-10-26').at(-1)).toBe(iso('2026-10-26T09:30:00Z')) // 10:30–11:00 těsně před blokací OK
+  })
+})

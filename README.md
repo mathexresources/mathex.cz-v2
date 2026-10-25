@@ -16,7 +16,8 @@ Postavený na **Next.js 16** + **Payload CMS 3** (administrace běží ve stejn�
 **Rezervace konzultací**
 - Typy schůzek (online, telefon, osobně) s vlastní délkou
 - Pracovní doba, krok slotů, pauza mezi schůzkami, minimální předstih, max. schůzek za den, dovolené
-- Volitelně blokuje časy obsazené ve tvém Google Kalendáři (tajná iCal adresa, bez OAuth)
+- Volné termíny podle tvého kalendáře v iPhonu (iCloud přes CalDAV), rezervace se do něj rovnou zapisují
+- Pevně blokované časy v administraci (každý týden nebo jednorázově), další kalendáře podle iCal adresy
 - Potvrzovací e-mail klientovi i tobě s pozvánkou `.ics`, zrušení přes odkaz v e-mailu
 - Odběr všech rezervací do kalendáře přes `/kalendar.ics?token=…`
 - Ochrana proti dvojí rezervaci téhož termínu
@@ -186,21 +187,47 @@ Panel *Kontrola služeb* průběžně ukazuje i stav kalendáře, antispamu, ana
 ## Testy
 
 ```bash
-npm test             # unit testy: termíny, časová pásma, .ics, antispam, šablony e-mailů, kalendář
+npm test             # unit testy: termíny, blokace, časová pásma, .ics, antispam, šablony e-mailů, kalendáře
 npm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
 E2E_DATABASE_URI=postgres://postgres:heslo@localhost:5432/mathex_e2e npm run test:e2e
 ```
 
-End-to-end testy si spustí vlastní zachytávací SMTP server a falešný Google Kalendář a projdou celý web
+End-to-end testy (potřebují `pip install radicale`) si spustí vlastní zachytávací SMTP server, CalDAV server
+místo iCloudu a falešný iCal kalendář a projdou celý web
 jako návštěvník: rezervaci s e-mailem a pozvánkou, zrušení odkazem, souběh dvou rezervací, kontaktní
 formulář, limity proti spamu, administraci a SEO. Na GitHubu běží automaticky – obraz pro server se
 postaví jen tehdy, když všechny testy projdou.
 
 ## Rezervace a kalendář
 
-- **Obsazenost z Google Kalendáře:** Google Kalendář → Nastavení kalendáře → *Tajná adresa ve formátu iCal* → vlož do `BUSY_CALENDAR_ICS_URL`. Časy, kdy máš něco v kalendáři, se nebudou nabízet (načítá se každých 5 minut).
-- **Rezervace do kalendáře:** nastav `CALENDAR_FEED_TOKEN` a v Google Kalendáři přidej *Další kalendáře → Přidat podle URL* → `https://mathex.cz/kalendar.ics?token=…`.
-- Bez `SMTP_HOST` se e-maily jen vypisují do logu (`docker compose logs web`).
+**Kalendář v iPhonu (iCloud).** Web se k němu připojí přes CalDAV:
+volné termíny počítá podle tvých skutečných událostí a každou rezervaci rovnou zapíše do kalendáře
+(po zrušení ji zase smaže).
+
+1. Na [appleid.apple.com](https://appleid.apple.com) → *Přihlášení a zabezpečení* → *Hesla pro aplikace* vytvoř heslo (např. „mathex web“).
+2. Do `.env` na serveru:
+   ```
+   CALDAV_USERNAME=tvoje@apple.id
+   CALDAV_PASSWORD=xxxx-xxxx-xxxx-xxxx
+   ```
+   a `docker compose up -d web`.
+3. V administraci → *Nastavení rezervací* → *Kalendář v iPhonu*: vyplň, které kalendáře blokují termíny
+   (prázdné = všechny) a do kterého se mají zapisovat rezervace (doporučuju si v iPhonu založit kalendář „Rezervace“).
+4. Na nástěnce v *Kontrole služeb* uvidíš, jestli připojení funguje a kolik obsazených bloků web vidí.
+
+Funguje to i s jiným CalDAV serverem (Nextcloud, Fastmail) – nastav navíc `CALDAV_URL`.
+
+**Pevně blokované časy.** Administrace → *Nastavení rezervací* → *Pevně blokované časy*:
+opakované (např. každé úterý 13:00–15:00) nebo jednorázové (konkrétní datum a čas).
+Celé dny volna nastavíš v *Dovolená a volna*.
+
+**Další kalendáře.** Google Kalendář nebo sdílený kalendář iCloud přidáš podle adresy (iCal/webcal) v *Nastavení rezervací*.
+
+**Odběr rezervací bez iCloudu.** Pokud CalDAV nepoužíváš, rezervace si můžeš odebírat:
+v *Kontrole služeb* je odkaz „Přidat do kalendáře v iPhonu / Macu“ (`webcal://…/kalendar.ics?token=…`).
+Odebírané kalendáře se v iPhonu obnovují s prodlevou – CalDAV je okamžitý.
+
+Bez `SMTP_HOST` se e-maily jen vypisují do logu (`docker compose logs web`).
 
 ## Struktura
 

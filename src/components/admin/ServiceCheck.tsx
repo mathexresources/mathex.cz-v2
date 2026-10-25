@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 type Check = { id: string; label: string; status: 'ok' | 'warn' | 'error' | 'off'; detail: string; help?: string }
-type Data = { checks: Check[]; calendarFeedUrl: string | null; userEmail: string }
+type Data = { checks: Check[]; calendarFeedUrl: string | null; calendarFeedWebcal: string | null; userEmail: string }
 
 const STATUS: Record<Check['status'], { label: string; color: string }> = {
   ok: { label: 'Funguje', color: '#1f6f43' },
@@ -128,11 +128,23 @@ export function ServiceCheck() {
           </ul>
 
           {data.calendarFeedUrl && (
-            <p style={{ marginTop: 12 }}>
-              Adresa pro odběr rezervací v Google Kalendáři (Další kalendáře → Přidat podle URL):
-              <br />
-              <code style={{ wordBreak: 'break-all' }}>{data.calendarFeedUrl}</code>
-            </p>
+            <div style={{ marginTop: 12, display: 'grid', gap: 6 }}>
+              <p style={{ margin: 0 }}>
+                <strong>Rezervace v kalendáři:</strong>{' '}
+                {data.calendarFeedWebcal && (
+                  <a href={data.calendarFeedWebcal} data-testid="webcal-link">
+                    Přidat do kalendáře v iPhonu / Macu
+                  </a>
+                )}{' '}
+                <span style={{ color: 'var(--theme-elevation-500)' }}>
+                  (otevři na iPhonu; nebo v Nastavení → Kalendář → Účty → Přidat účet → Jiný → Přidat odebíraný kalendář)
+                </span>
+              </p>
+              <p style={{ margin: 0 }}>
+                Google Kalendář (Další kalendáře → Přidat podle URL):{' '}
+                <code style={{ wordBreak: 'break-all' }}>{data.calendarFeedUrl}</code>
+              </p>
+            </div>
           )}
 
           <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

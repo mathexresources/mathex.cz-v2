@@ -68,6 +68,11 @@ jobs:
         run: cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
       - name: Prohlížeč pro testy
         run: npx playwright install --with-deps chromium
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: CalDAV server pro testy kalendáře (Radicale)
+        run: pip install radicale
       - name: Testy (rezervace, e-maily, kalendář, administrace, SEO)
         run: npx playwright test
         env:

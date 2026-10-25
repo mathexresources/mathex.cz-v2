@@ -1,7 +1,7 @@
 import type { Endpoint } from 'payload'
 
 import { isEmail } from '@/lib/guard-shared'
-import { calendarFeedUrl, runDiagnostics, sendTestEmail } from '@/lib/diagnostics'
+import { calendarFeedUrl, calendarFeedWebcal, runDiagnostics, sendTestEmail } from '@/lib/diagnostics'
 
 const unauthorized = () => Response.json({ error: 'Přihlas se do administrace.' }, { status: 401 })
 
@@ -11,9 +11,9 @@ export const diagnosticsEndpoint: Endpoint = {
   method: 'get',
   handler: async (req) => {
     if (!req.user) return unauthorized()
-    const checks = await runDiagnostics()
+    const checks = await runDiagnostics(req.payload)
     return Response.json(
-      { checks, calendarFeedUrl: calendarFeedUrl(), userEmail: req.user.email },
+      { checks, calendarFeedUrl: calendarFeedUrl(), calendarFeedWebcal: calendarFeedWebcal(), userEmail: req.user.email },
       { headers: { 'Cache-Control': 'no-store' } },
     )
   },

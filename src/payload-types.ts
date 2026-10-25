@@ -568,6 +568,10 @@ export interface Booking {
   message?: string | null;
   internalNotes?: string | null;
   cancelToken?: string | null;
+  /**
+   * Vyplní se, když se rezervace zapíše do kalendáře v iPhonu.
+   */
+  calendarEventUrl?: string | null;
   consent?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -974,6 +978,7 @@ export interface BookingsSelect<T extends boolean = true> {
   message?: T;
   internalNotes?: T;
   cancelToken?: T;
+  calendarEventUrl?: T;
   consent?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1223,6 +1228,43 @@ export interface BookingSetting {
       }[]
     | null;
   /**
+   * Časy, kdy rezervace nechceš, i když máš v kalendáři volno – např. každé úterý 13:00–15:00, nebo jednou konkrétní den.
+   */
+  blockedTimes?:
+    | {
+        repeat: 'weekly' | 'once';
+        day?: ('1' | '2' | '3' | '4' | '5' | '6' | '0') | null;
+        date?: string | null;
+        from: string;
+        to: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Připojení se nastavuje v .env na serveru (ICLOUD_USERNAME a ICLOUD_APP_PASSWORD). Stav uvidíš na nástěnce v Kontrole služeb.
+   */
+  calendar?: {
+    /**
+     * Názvy kalendářů oddělené čárkou, přesně jak je máš v iPhonu (např. „Domov, Práce“). Prázdné = všechny.
+     */
+    busyCalendars?: string | null;
+    /**
+     * Název kalendáře v iPhonu. Prázdné = rezervace se do iCloudu nezapisují.
+     */
+    bookingCalendar?: string | null;
+  };
+  /**
+   * Např. tajná iCal adresa Google Kalendáře nebo veřejný odkaz na sdílený kalendář iCloud. Obsazené časy se nenabízí.
+   */
+  icsUrls?:
+    | {
+        name: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Když nevyplníš, použije se e-mail z Nastavení webu.
    */
   notifyEmail?: string | null;
@@ -1362,6 +1404,30 @@ export interface BookingSettingsSelect<T extends boolean = true> {
         from?: T;
         to?: T;
         reason?: T;
+        id?: T;
+      };
+  blockedTimes?:
+    | T
+    | {
+        repeat?: T;
+        day?: T;
+        date?: T;
+        from?: T;
+        to?: T;
+        note?: T;
+        id?: T;
+      };
+  calendar?:
+    | T
+    | {
+        busyCalendars?: T;
+        bookingCalendar?: T;
+      };
+  icsUrls?:
+    | T
+    | {
+        name?: T;
+        url?: T;
         id?: T;
       };
   notifyEmail?: T;

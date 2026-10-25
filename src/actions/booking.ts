@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto'
 
 import { sendBookingEmails, sendCancellationEmail } from '@/lib/booking-emails'
 import { getBusyIntervals } from '@/lib/busy-calendar'
+import { parseNames } from '@/lib/caldav'
 import { getBookingSettings } from '@/lib/data'
 import { clean, clientIp, isEmail, looksLikeBot, rateLimit, verifyTurnstile } from '@/lib/guard'
 import { getPayloadClient } from '@/lib/payload'
@@ -34,7 +35,12 @@ async function loadContext(typeIndex: number) {
     select: { start: true, end: true },
   })
   const bookings: Interval[] = existing.docs.map((d) => ({ start: new Date(d.start), end: new Date(d.end) }))
-  const busy = await getBusyIntervals(now, rangeEnd)
+  const busy = await getBusyIntervals(now, rangeEnd, {
+    sources: {
+      icsUrls: (settings.icsUrls ?? []).map((c) => c.url).filter(Boolean),
+      caldavCalendars: parseNames(settings.calendar?.busyCalendars),
+    },
+  })
   return { settings, type, bookings, busy, payload }
 }
 

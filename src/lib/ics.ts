@@ -71,15 +71,16 @@ function eventLines(e: IcsEvent): string[] {
 
 export function buildCalendar(
   events: IcsEvent[],
-  opts: { method?: 'REQUEST' | 'CANCEL' | 'PUBLISH'; name?: string } = {},
+  /** method: null = bez METHOD (událost ukládaná přímo do kalendáře přes CalDAV) */
+  opts: { method?: 'REQUEST' | 'CANCEL' | 'PUBLISH' | null; name?: string } = {},
 ): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Mathex//Rezervace//CS',
     'CALSCALE:GREGORIAN',
-    `METHOD:${opts.method ?? 'PUBLISH'}`,
   ]
+  if (opts.method !== null) lines.push(`METHOD:${opts.method ?? 'PUBLISH'}`)
   if (opts.name) lines.push(`X-WR-CALNAME:${escapeText(opts.name)}`)
   for (const e of events) lines.push(...eventLines(e))
   lines.push('END:VCALENDAR')

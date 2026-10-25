@@ -95,3 +95,25 @@ describe('obsazenost z kalendáře', () => {
     await expect(getBusyIntervals(from, to, { throwOnError: true })).rejects.toThrow(/iCal/)
   })
 })
+
+describe('adresy kalendářů', () => {
+  it('webcal:// převede na https://', async () => {
+    const { normalizeIcsUrl } = await import('@/lib/busy-calendar')
+    expect(normalizeIcsUrl(' webcal://p01-caldav.icloud.com/published/2/abc ')).toBe('https://p01-caldav.icloud.com/published/2/abc')
+    expect(normalizeIcsUrl('https://x.cz/a.ics')).toBe('https://x.cz/a.ics')
+  })
+
+  it('spojí více kalendářů a nahlásí ten, který nejde načíst', async () => {
+    const good = 'https://calendar.example/good.ics'
+    const bad = 'webcal://calendar.example/bad.ics'
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) =>
+      String(url).includes('good') ? new Response(ICS) : new Response('x', { status: 404 }),
+    )
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const report: { source: string; ok: boolean; count: number }[] = []
+    const busy = await getBusyIntervals(from, to, { sources: { icsUrls: [good, bad] }, report })
+    expect(busy).toHaveLength(4)
+    expect(report.find((r) => r.source === good)?.ok).toBe(true)
+    expect(report.find((r) => r.source.includes('bad'))?.ok).toBe(false)
+  })
+})

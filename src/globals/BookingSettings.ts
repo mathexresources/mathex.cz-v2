@@ -1,6 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
-import { anyone, isLoggedIn } from '@/access'
+import { isLoggedIn } from '@/access'
 import { revalidateGlobal } from '@/hooks/revalidate'
 
 export const WEEKDAYS = [
@@ -22,7 +22,8 @@ export const BookingSettings: GlobalConfig = {
   slug: 'booking-settings',
   label: 'Nastavení rezervací',
   admin: { group: 'Nastavení' },
-  access: { read: anyone, update: isLoggedIn },
+  // Web čte nastavení interně – přes API ho vidí jen přihlášený (poznámky, adresy kalendářů)
+  access: { read: isLoggedIn, update: isLoggedIn },
   hooks: { afterChange: [revalidateGlobal] },
   fields: [
     {
@@ -118,6 +119,118 @@ export const BookingSettings: GlobalConfig = {
             { name: 'from', label: 'Od', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayOnly' } } },
             { name: 'to', label: 'Do (včetně)', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayOnly' } } },
             { name: 'reason', label: 'Poznámka', type: 'text' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'blockedTimes',
+      label: 'Pevně blokované časy',
+      labels: { singular: 'Blokace', plural: 'Blokované časy' },
+      type: 'array',
+      admin: {
+        description:
+          'Časy, kdy rezervace nechceš, i když máš v kalendáři volno – např. každé úterý 13:00–15:00, nebo jednou konkrétní den.',
+        initCollapsed: false,
+        components: { RowLabel: '@/components/admin/BlockedTimeRowLabel#BlockedTimeRowLabel' },
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'repeat',
+              label: 'Opakování',
+              type: 'select',
+              required: true,
+              defaultValue: 'weekly',
+              options: [
+                { label: 'Každý týden', value: 'weekly' },
+                { label: 'Jednou', value: 'once' },
+              ],
+              admin: { width: '25%' },
+            },
+            {
+              name: 'day',
+              label: 'Den',
+              type: 'select',
+              options: WEEKDAYS.map((d) => ({ label: d.label, value: d.value })),
+              admin: { width: '25%', condition: (_, sibling) => sibling?.repeat !== 'once' },
+              validate: (value: unknown, { siblingData }: { siblingData: { repeat?: string } }) =>
+                siblingData?.repeat === 'once' || value ? true : 'Vyber den v týdnu',
+            },
+            {
+              name: 'date',
+              label: 'Datum',
+              type: 'date',
+              admin: {
+                width: '25%',
+                date: { pickerAppearance: 'dayOnly', displayFormat: 'd. M. yyyy' },
+                condition: (_, sibling) => sibling?.repeat === 'once',
+              },
+              validate: (value: unknown, { siblingData }: { siblingData: { repeat?: string } }) =>
+                siblingData?.repeat !== 'once' || value ? true : 'Vyber datum',
+            },
+            { name: 'from', label: 'Od', type: 'text', required: true, validate: timeValidate, admin: { width: '15%' } },
+            { name: 'to', label: 'Do', type: 'text', required: true, validate: timeValidate, admin: { width: '15%' } },
+          ],
+        },
+        { name: 'note', label: 'Poznámka (jen pro tebe)', type: 'text' },
+      ],
+    },
+    {
+      name: 'calendar',
+      label: 'Kalendář v iPhonu (iCloud)',
+      type: 'group',
+      admin: {
+        description:
+          'Připojení se nastavuje v .env na serveru (ICLOUD_USERNAME a ICLOUD_APP_PASSWORD). Stav uvidíš na nástěnce v Kontrole služeb.',
+      },
+      fields: [
+        {
+          name: 'busyCalendars',
+          label: 'Které kalendáře blokují termíny',
+          type: 'text',
+          admin: {
+            description:
+              'Názvy kalendářů oddělené čárkou, přesně jak je máš v iPhonu (např. „Domov, Práce“). Prázdné = všechny.',
+          },
+        },
+        {
+          name: 'bookingCalendar',
+          label: 'Do kterého kalendáře zapisovat rezervace',
+          type: 'text',
+          admin: {
+            description: 'Název kalendáře v iPhonu. Prázdné = rezervace se do iCloudu nezapisují.',
+          },
+        },
+      ],
+    },
+    {
+      name: 'icsUrls',
+      label: 'Další kalendáře podle adresy (iCal / webcal)',
+      type: 'array',
+      access: { read: ({ req }) => Boolean(req.user) },
+      admin: {
+        description:
+          'Např. tajná iCal adresa Google Kalendáře nebo veřejný odkaz na sdílený kalendář iCloud. Obsazené časy se nenabízí.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'name', label: 'Název', type: 'text', required: true, admin: { width: '30%' } },
+            {
+              name: 'url',
+              label: 'Adresa',
+              type: 'text',
+              required: true,
+              admin: { width: '70%' },
+              validate: (v: unknown) =>
+                typeof v === 'string' && /^(https?|webcal):\/\//i.test(v.trim())
+                  ? true
+                  : 'Adresa musí začínat https:// nebo webcal://',
+            },
           ],
         },
       ],
