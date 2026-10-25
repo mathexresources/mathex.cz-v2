@@ -1,3 +1,9 @@
-// Tento soubor přegeneruje `npm run migrate:create`. Dokud je prázdný, databáze
-// se v produkci nevytvoří – viz README, sekce „Databázové migrace“.
-export const migrations: never[] = []
+import * as migration_20261025_190000_initial from './20261025_190000_initial';
+
+export const migrations = [
+  {
+    up: migration_20261025_190000_initial.up,
+    down: migration_20261025_190000_initial.down,
+    name: '20261025_190000_initial'
+  },
+];

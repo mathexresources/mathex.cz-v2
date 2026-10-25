@@ -1,5 +1,3 @@
-import '@fontsource-variable/bricolage-grotesque'
-import '@fontsource-variable/source-serif-4'
 import './globals.css'
 
 import type { Metadata, Viewport } from 'next'
@@ -9,6 +7,7 @@ import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { JsonLd } from '@/components/JsonLd'
 import { MobileCta } from '@/components/MobileCta'
+import { displayFont, serifFont } from '@/fonts'
 import { getPages, getServices, getSiteSettings, getTestimonials } from '@/lib/data'
 import { businessSchema, personSchema, websiteSchema } from '@/lib/schema'
 import { SITE_URL } from '@/lib/seo'
@@ -62,7 +61,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   ])
 
   return (
-    <html lang="cs">
+    <html lang="cs" className={`${displayFont.variable} ${serifFont.variable}`}>
       <body>
         <a
           href="#obsah"

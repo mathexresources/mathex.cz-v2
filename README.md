@@ -1,7 +1,7 @@
 # Mathex – web pro tvorbu webů na míru
 
 Prezentační web s portfoliem, ceníkem, blogem, administrací a rezervací konzultací.
-Postavený na **Next.js 15** + **Payload CMS 3** (administrace běží ve stejné aplikaci na `/admin`) a **PostgreSQL**. Nasazení přes Docker Compose.
+Postavený na **Next.js 16** + **Payload CMS 3** (administrace běží ve stejné aplikaci na `/admin`) a **PostgreSQL**. Nasazení přes Docker Compose.
 
 ## Co web umí
 
@@ -33,7 +33,8 @@ Postavený na **Next.js 15** + **Payload CMS 3** (administrace běží ve stejn�
 - `sitemap.xml`, `robots.txt`, canonical URL, Open Graph a Twitter karty
 - Automaticky generované obrázky pro sdílení (`opengraph-image`)
 - Strukturovaná data: ProfessionalService, Person, WebSite, BreadcrumbList, FAQPage, BlogPosting, Service, OfferCatalog
-- Obrázky v AVIF/WebP se `srcset`, self-hostovaná písma, minimum JavaScriptu
+- Obrázky v AVIF/WebP se `srcset`, písma podmnožená na češtinu (2 × 40 kB) s preloadem, CSS vložené do HTML
+- Lighthouse (lokální měření): desktop výkon 100, mobil 86–93, přístupnost a best practices 100
 - Bezpečnostní hlavičky (HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy)
 - Analytika bez cookies (Plausible nebo Umami) – není potřeba cookie lišta
 
@@ -51,19 +52,16 @@ cd mathex.cz-v2
 cp .env.example .env
 # vyplň minimálně: NEXT_PUBLIC_SITE_URL, POSTGRES_PASSWORD, PAYLOAD_SECRET (openssl rand -hex 32)
 
+# 1) databáze + výchozí obsah a účet administrátora (migrace se spustí samy)
 docker compose up -d db
-
-# jen pokud ve složce src/migrations zatím není nic kromě index.ts:
-# v produkci Payload vytváří tabulky výhradně z migrací
-docker compose --profile tools run --rm tools npm run migrate:create -- initial
-git add src/migrations && git commit -m "Úvodní migrace databáze"
-
-docker compose up -d --build
-
-# první naplnění obsahem + vytvoření administrátora
 ADMIN_EMAIL=ty@mathex.cz ADMIN_PASSWORD='silne-heslo' \
   docker compose --profile tools run --rm -e ADMIN_EMAIL -e ADMIN_PASSWORD tools
+
+# 2) web
+docker compose up -d --build
 ```
+
+Seed spouštěj před prvním spuštěním webu. Kdyby se obsah nahraný mimo administraci na webu neprojevil, pomůže `docker compose up -d --force-recreate web` (vyčistí cache).
 
 Web poslouchá na `127.0.0.1:3000`. Příklad pro **Caddy**:
 

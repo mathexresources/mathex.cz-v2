@@ -160,7 +160,7 @@ const faqData = [
   { topic: 'obor', question: 'Jde na web dát denní menu, které si budu měnit sám?', answer: 'Ano, menu upravíte v administraci za minutu, i z mobilu.' },
 ] as const
 
-const faqIds: Record<string, number | string> = {}
+const faqIds: Record<string, number> = {}
 for (const [i, f] of faqData.entries()) {
   const doc = await payload.create({ collection: 'faqs', data: { ...f, order: i, showOnFaqPage: true } })
   faqIds[f.question] = doc.id

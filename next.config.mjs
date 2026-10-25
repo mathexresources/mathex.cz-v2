@@ -12,9 +12,11 @@ const securityHeaders = [
 const nextConfig = {
   output: 'standalone',
   poweredByHeader: false,
+  // CSS vložené přímo do HTML – žádný blokující požadavek navíc
+  experimental: { inlineCss: true },
   // Písmo pro generované obrázky ke sdílení (lib/og.tsx) musí být i v Docker image
   outputFileTracingIncludes: {
-    '/**': ['./node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin*-700-normal.woff'],
+    '/**': ['./assets/og-bold.ttf'],
   },
   images: {
     formats: ['image/avif', 'image/webp'],

@@ -82,7 +82,7 @@ export const getPackages = cached(async () => {
   return res.docs
 }, 'packages')
 
-export const getTestimonials = cached(async (limit = 6) => {
+export const getTestimonials = cached(async (limit: number = 6) => {
   const payload = await getPayloadClient()
   const res = await payload.find({ collection: 'testimonials', limit, depth: 1, sort: '-createdAt' })
   return res.docs

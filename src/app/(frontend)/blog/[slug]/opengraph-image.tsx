@@ -1,6 +1,7 @@
 import { getPostBySlug, getSiteSettings } from '@/lib/data'
 import { OG_SIZE, renderOg } from '@/lib/og'
 
+export const dynamic = 'force-dynamic'
 export const size = OG_SIZE
 export const contentType = 'image/png'
 export const alt = 'Článek z blogu'

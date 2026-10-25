@@ -10,7 +10,8 @@ const text = (t: string) => ({ type: 'text', text: t, format: 0, detail: 0, mode
 
 const base = { format: '', indent: 0, version: 1, direction: 'ltr' as const }
 
-export function rt(source: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function rt(source: string): any {
   const blocks = source.trim().split(/\n{2,}/)
   const children: unknown[] = []
 

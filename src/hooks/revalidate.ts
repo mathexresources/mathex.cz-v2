@@ -13,7 +13,7 @@ import { CMS_CACHE_TAG } from '@/lib/cache-tag'
 async function revalidate() {
   try {
     const { revalidateTag } = await import('next/cache')
-    revalidateTag(CMS_CACHE_TAG)
+    revalidateTag(CMS_CACHE_TAG, { expire: 0 })
   } catch {
     // Mimo Next.js (např. při seedování) cache neexistuje – nic se neděje.
   }

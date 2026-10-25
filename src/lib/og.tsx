@@ -5,21 +5,15 @@ import { ImageResponse } from 'next/og'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
-const FONT_DIR = path.join(process.cwd(), 'node_modules/@fontsource/bricolage-grotesque/files')
+const FONT_PATH = path.join(process.cwd(), 'assets/og-bold.ttf')
 
 async function loadFonts() {
-  const files = ['latin', 'latin-ext'].map((subset) =>
-    readFile(path.join(FONT_DIR, `bricolage-grotesque-${subset}-700-normal.woff`)).catch(() => null),
-  )
-  const buffers = await Promise.all(files)
-  return buffers
-    .filter((b): b is Buffer => b !== null)
-    .map((b) => ({
-      name: 'Bricolage',
-      data: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer,
-      weight: 700 as const,
-      style: 'normal' as const,
-    }))
+  try {
+    const file = await readFile(FONT_PATH)
+    return [{ name: 'Bricolage', data: new Uint8Array(file).buffer as ArrayBuffer, weight: 700 as const, style: 'normal' as const }]
+  } catch {
+    return []
+  }
 }
 
 /** Automaticky generovaný obrázek pro sdílení na sociálních sítích. */
