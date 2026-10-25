@@ -18,7 +18,9 @@ export function proxy(req: NextRequest) {
   } catch {
     // SITE_URL není nastavené – zůstane odhad z hlaviček
   }
-  return NextResponse.redirect(`${origin}${path}`, 301)
+  // Hlavička Location ručně – NextResponse.redirect umí adresu „zkrátit“ na relativní,
+  // a pak by www přesměrovávalo samo na sebe.
+  return new NextResponse(null, { status: 301, headers: { Location: `${origin}${path}` } })
 }
 
 export const config = {

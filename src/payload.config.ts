@@ -22,6 +22,7 @@ import { Projects } from './collections/Projects'
 import { Services } from './collections/Services'
 import { Testimonials } from './collections/Testimonials'
 import { Users } from './collections/Users'
+import { diagnosticsEndpoint, testEmailEndpoint } from './endpoints/diagnostics'
 import { AboutPage } from './globals/AboutPage'
 import { BookingSettings } from './globals/BookingSettings'
 import { HomePage } from './globals/HomePage'
@@ -59,7 +60,12 @@ export default buildConfig({
     },
     importMap: { baseDir: path.resolve(dirname) },
     dateFormat: 'd. M. yyyy HH:mm',
+    components: {
+      // Panel „Kontrola služeb“ na nástěnce administrace
+      beforeDashboard: ['@/components/admin/ServiceCheck#ServiceCheck'],
+    },
   },
+  endpoints: [diagnosticsEndpoint, testEmailEndpoint],
   i18n: {
     supportedLanguages: { cs, en },
     fallbackLanguage: 'cs',

@@ -161,6 +161,41 @@ npm run generate:importmap   # pokud přibyly vlastní komponenty administrace
 npm run migrate:create       # migrace databáze – commitni ji, v produkci se spustí sama
 ```
 
+## E-maily
+
+Web posílá potvrzení rezervací (s pozvánkou do kalendáře), e-maily o zrušení a upozornění na poptávky
+přes SMTP. Bez nastaveného SMTP se e-maily jen vypisují do logu (`docker compose logs web`).
+
+**Doporučené bezplatné nastavení (doména v Cloudflare):**
+
+1. **Příjem** – Cloudflare → doména → *Email → Email Routing*: přesměruj `ahoj@mathex.cz` do svého Gmailu.
+2. **Odesílání z webu** – [Resend](https://resend.com) (zdarma 100 e-mailů denně): přidej doménu,
+   vlož DNS záznamy, které ukáže, do Cloudflare a vytvoř API klíč. Do `.env`:
+   ```
+   SMTP_HOST=smtp.resend.com
+   SMTP_PORT=465
+   SMTP_USER=resend
+   SMTP_PASS=re_...        # API klíč
+   SMTP_FROM_ADDRESS=web@mathex.cz
+   ```
+   a `docker compose up -d web`.
+3. **Ověření** – v administraci na nástěnce v panelu *Kontrola služeb* klikni na *Odeslat zkušební e-mail*.
+
+Panel *Kontrola služeb* průběžně ukazuje i stav kalendáře, antispamu, analytiky a adresy webu.
+
+## Testy
+
+```bash
+npm test             # unit testy: termíny, časová pásma, .ics, antispam, šablony e-mailů, kalendář
+npm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+E2E_DATABASE_URI=postgres://postgres:heslo@localhost:5432/mathex_e2e npm run test:e2e
+```
+
+End-to-end testy si spustí vlastní zachytávací SMTP server a falešný Google Kalendář a projdou celý web
+jako návštěvník: rezervaci s e-mailem a pozvánkou, zrušení odkazem, souběh dvou rezervací, kontaktní
+formulář, limity proti spamu, administraci a SEO. Na GitHubu běží automaticky – obraz pro server se
+postaví jen tehdy, když všechny testy projdou.
+
 ## Rezervace a kalendář
 
 - **Obsazenost z Google Kalendáře:** Google Kalendář → Nastavení kalendáře → *Tajná adresa ve formátu iCal* → vlož do `BUSY_CALENDAR_ICS_URL`. Časy, kdy máš něco v kalendáři, se nebudou nabízet (načítá se každých 5 minut).
