@@ -45,9 +45,10 @@ services:
       NODE_OPTIONS: --max-old-space-size=512
     volumes:
       - media:/app/media
-    # Jen lokálně – ven web pouští Cloudflare Tunnel nebo tvoje reverzní proxy
+    # Výchozí: jen lokálně (ven web pouští Cloudflare Tunnel nebo reverzní proxy).
+    # WEB_BIND=0.0.0.0 v .env ho zpřístupní v domácí síti, např. http://192.168.0.101:3000
     ports:
-      - '127.0.0.1:3000:3000'
+      - '${WEB_BIND:-127.0.0.1}:3000:3000'
     mem_limit: 1g
     logging: *logging
 
