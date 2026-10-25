@@ -1,0 +1,52 @@
+{
+  "name": "mathex-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prezentační web s blogem, portfoliem a rezervací konzultací (Next.js + Payload CMS)",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "payload generate:importmap && payload generate:types",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "migrate": "payload migrate",
+    "migrate:create": "payload migrate:create",
+    "seed": "payload run src/seed/index.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.2.0",
+    "@fontsource-variable/source-serif-4": "^5.2.0",
+    "@fontsource/bricolage-grotesque": "^5.2.0",
+    "@payloadcms/db-postgres": "^3.0.0",
+    "@payloadcms/email-nodemailer": "^3.0.0",
+    "@payloadcms/next": "^3.0.0",
+    "@payloadcms/plugin-seo": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "@payloadcms/translations": "^3.0.0",
+    "@payloadcms/ui": "^3.0.0",
+    "graphql": "^16.9.0",
+    "next": "^15.4.0",
+    "node-ical": "^0.20.0",
+    "payload": "^3.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

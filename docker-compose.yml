@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mathex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Nastav POSTGRES_PASSWORD v .env}
+      POSTGRES_DB: ${POSTGRES_DB:-mathex}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://mathex.cz}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+        NEXT_PUBLIC_PLAUSIBLE_DOMAIN: ${NEXT_PUBLIC_PLAUSIBLE_DOMAIN:-}
+        NEXT_PUBLIC_PLAUSIBLE_SRC: ${NEXT_PUBLIC_PLAUSIBLE_SRC:-https://plausible.io/js/script.js}
+        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+        NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URI: postgres://${POSTGRES_USER:-mathex}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mathex}
+    volumes:
+      - media:/app/media
+    # Web poslouchá jen lokálně – před něj dej svůj reverzní proxy (Caddy, Nginx, Traefik) s HTTPS.
+    ports:
+      - '127.0.0.1:3000:3000'
+
+  # Jednorázové nástroje: `docker compose --profile tools run --rm tools npm run seed`
+  tools:
+    profiles: ['tools']
+    build:
+      context: .
+      target: builder
+    env_file: .env
+    environment:
+      DATABASE_URI: postgres://${POSTGRES_USER:-mathex}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mathex}
+      MEDIA_DIR: /app/media
+      # produkční režim = Payload nemění schéma databáze sám, jen přes migrace
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media:/app/media
+      # aby `migrate:create` zapsal migrace přímo do repozitáře
+      - ./src/migrations:/app/src/migrations
+    command: ['npm', 'run', 'seed']
+
+volumes:
+  db-data:
+  media:
