@@ -8,7 +8,7 @@ import { buildMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = buildMetadata({
   title: 'Portfolio – ukázky webů',
-  description: 'Weby pro řemeslníky, restaurace a malé firmy. U každého projektu najdete dobu realizace a rychlost načítání.',
+  description: 'Ukázky webů na míru. U každého projektu najdete dobu realizace a rychlost načítání.',
   path: '/portfolio',
 })
 

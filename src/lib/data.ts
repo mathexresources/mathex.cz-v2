@@ -76,9 +76,15 @@ export const getProjectBySlug = cached(async (slug: string) => {
   return res.docs[0] ?? null
 }, 'project-by-slug')
 
-export const getPackages = cached(async () => {
+export const getPackages = cached(async (category: 'web' | 'prednasky' = 'web') => {
   const payload = await getPayloadClient()
-  const res = await payload.find({ collection: 'packages', sort: 'order', limit: 20, depth: 0 })
+  const res = await payload.find({
+    collection: 'packages',
+    where: category === 'web' ? { or: [{ category: { equals: 'web' } }, { category: { exists: false } }] } : { category: { equals: category } },
+    sort: 'order',
+    limit: 20,
+    depth: 0,
+  })
   return res.docs
 }, 'packages')
 

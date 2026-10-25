@@ -16,8 +16,15 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default async function ContactPage() {
-  const site = await getSiteSettings()
+const TOPICS: Record<string, string> = {
+  prednaska:
+    'Mám zájem o přednášku o bezpečnosti na internetu.\n\nPro koho (škola, firma, senioři…):\nPřibližný počet lidí:\nMísto a termín:\nTémata, která nás zajímají:',
+  web: 'Mám zájem o web na míru.\n\nČím se zabýváme:\nCo by měl web umět:\nSoučasný web (pokud je):',
+}
+
+export default async function ContactPage({ searchParams }: { searchParams: Promise<{ tema?: string }> }) {
+  const [site, { tema }] = await Promise.all([getSiteSettings(), searchParams])
+  const initialMessage = tema ? TOPICS[tema] : undefined
   const address = [site.street, [site.zip, site.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')
 
   return (
@@ -29,7 +36,12 @@ export default async function ContactPage() {
       />
       <div className="container-site mt-14 grid gap-16 lg:grid-cols-[1fr_20rem]">
         <div className="max-w-3xl">
-          <ContactForm privacyHref="/ochrana-osobnich-udaju" source="/kontakt" turnstileSiteKey={env.turnstileSiteKey} />
+          <ContactForm
+            privacyHref="/ochrana-osobnich-udaju"
+            source={tema ? `/kontakt?tema=${tema}` : '/kontakt'}
+            turnstileSiteKey={env.turnstileSiteKey}
+            initialMessage={initialMessage}
+          />
         </div>
 
         <aside className="ui space-y-8 lg:border-l lg:border-line lg:pl-8">

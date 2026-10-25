@@ -21,7 +21,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'tagline',
               label: 'Podtitul (do titulku stránek)',
               type: 'text',
-              defaultValue: 'Weby na míru pro řemeslníky, restaurace a malé firmy',
+              defaultValue: 'Weby na míru a přednášky o bezpečnosti na internetu',
             },
             {
               name: 'defaultDescription',

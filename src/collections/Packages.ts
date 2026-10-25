@@ -8,7 +8,7 @@ export const Packages: CollectionConfig = {
   labels: { singular: 'Balíček', plural: 'Ceník' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'price', 'deliveryDays', 'order'],
+    defaultColumns: ['name', 'category', 'price', 'deliveryDays', 'order'],
     group: 'Obsah',
   },
   access: { read: anyone, create: isLoggedIn, update: isLoggedIn, delete: isLoggedIn },
@@ -16,6 +16,18 @@ export const Packages: CollectionConfig = {
   hooks: revalidateHooks,
   fields: [
     { name: 'name', label: 'Název balíčku', type: 'text', required: true },
+    {
+      name: 'category',
+      label: 'Patří k',
+      type: 'select',
+      required: true,
+      defaultValue: 'web',
+      options: [
+        { label: 'Weby', value: 'web' },
+        { label: 'Přednášky', value: 'prednasky' },
+      ],
+      admin: { position: 'sidebar', description: 'Na stránce služby se ukáže jen ceník, který k ní patří.' },
+    },
     {
       type: 'row',
       fields: [
@@ -26,7 +38,7 @@ export const Packages: CollectionConfig = {
           type: 'checkbox',
           defaultValue: true,
         },
-        { name: 'deliveryDays', label: 'Dodání do (pracovních dní)', type: 'number', min: 1 },
+        { name: 'deliveryDays', label: 'Dodání do (pracovních dní)', type: 'number', min: 1, admin: { condition: (data) => data?.category !== 'prednasky' } },
       ],
     },
     {

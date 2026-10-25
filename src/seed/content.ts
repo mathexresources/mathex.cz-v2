@@ -5,6 +5,18 @@
  */
 import type { Payload } from 'payload'
 
+import {
+  ABOUT,
+  GENERAL_WEB_POST,
+  HOME,
+  LECTURE_FAQS,
+  LECTURE_SERVICE,
+  SECURITY_CATEGORY,
+  SECURITY_POST,
+  SITE,
+  WEB_SECURITY_FAQ,
+  WEB_SERVICE,
+} from './defaults'
 import { rt } from './richtext'
 
 export async function seedIfEmpty(payload: Payload): Promise<boolean> {
@@ -14,6 +26,30 @@ export async function seedIfEmpty(payload: Payload): Promise<boolean> {
   return true
 }
 
+type ServiceDefaults = {
+  title: string
+  slug: string
+  segment: 'weby' | 'bezpecnost'
+  order: number
+  headline: string
+  intro: string
+  shortDescription: string
+  painPoints: string[]
+  features: { title: string; text: string }[]
+}
+
+export const serviceData = (d: ServiceDefaults) => ({
+  title: d.title,
+  slug: d.slug,
+  segment: d.segment,
+  order: d.order,
+  headline: d.headline,
+  intro: d.intro,
+  shortDescription: d.shortDescription,
+  painPoints: d.painPoints.map((text) => ({ text })),
+  features: d.features,
+})
+
 export async function seedContent(payload: Payload) {
   const log = (msg: string) => payload.logger.info(`[seed] ${msg}`)
 
@@ -22,9 +58,8 @@ export async function seedContent(payload: Payload) {
     slug: 'site-settings',
     data: {
       brandName: 'Mathex',
-      tagline: 'Weby na míru pro řemeslníky, restaurace a malé firmy',
-      defaultDescription:
-        'Navrhnu a naprogramuju rychlý web na míru do dvou týdnů. Pro řemeslníky, restaurace, kavárny, salony a další malé firmy. Pevná cena předem.',
+      tagline: SITE.tagline,
+      defaultDescription: SITE.defaultDescription,
       ownerName: 'Jméno Příjmení',
       ico: '00000000',
       vatPayer: false,
@@ -40,13 +75,12 @@ export async function seedContent(payload: Payload) {
   await payload.updateGlobal({
     slug: 'home-page',
     data: {
-      heroTitle: 'Weby pro řemeslníky, restaurace a malé firmy. Hotové do dvou týdnů.',
-      heroText:
-        'Navrhnu a naprogramuju web, který se načte dřív, než zákazník stihne odejít ke konkurenci. Žádné šablony, žádné měsíční poplatky za stavebnici.',
+      heroTitle: HOME.heroTitle,
+      heroText: HOME.heroText,
       process: [
         {
           title: 'Konzultace',
-          text: 'Za 30 minut probereme, co děláte, kdo jsou vaši zákazníci a co má web umět. Pošlu vám pevnou cenu a termín.',
+          text: 'Za 30 minut probereme, co děláte, pro koho je web a co má umět. Pošlu vám pevnou cenu a termín.',
           duration: 'Zdarma, 30 minut',
         },
         {
@@ -65,27 +99,16 @@ export async function seedContent(payload: Payload) {
           duration: '1 den',
         },
       ],
-      closingTitle: 'Pojďme se na váš web podívat spolu',
-      closingText:
-        'Úvodní konzultace trvá 30 minut a je zdarma. Řeknete mi, co děláte a co od webu chcete, já vám řeknu, co to bude stát a kdy to bude hotové.',
+      closingTitle: HOME.closingTitle,
+      closingText: HOME.closingText,
     },
   })
 
   await payload.updateGlobal({
     slug: 'about-page',
     data: {
-      headline: 'Jsem vývojář, který píše weby pro lidi, co mají plné ruce práce',
-      body: rt(`
-  Tady bude váš příběh. Pár odstavců o tom, kdo jste, jak jste se k webům dostali a proč děláte weby právě pro malé firmy. Lidé si u freelancera kupují i člověka, takže klidně osobně.
-
-  ## Proč weby na míru
-
-  Stavebnice typu Wix nebo Webnode jsou pomalé, vypadají podobně a platíte za ně každý měsíc. Web napsaný na míru se načte za zlomek času, Google ho má radši a patří celý vám.
-
-  ## Co pro mě znamená rychlost
-
-  Rychlost je dvojí: web se rychle načte a já ho rychle dodám. Malá firma nemá čas čekat tři měsíce na agenturu.
-      `),
+      headline: ABOUT.headline,
+      body: ABOUT.body(),
       facts: [
         { label: 'Sídlo', value: 'Praha' },
         { label: 'Weby od roku', value: '20XX' },
@@ -134,9 +157,9 @@ export async function seedContent(payload: Payload) {
     { topic: 'technika', question: 'Komu patří web a doména?', answer: 'Vám. Doména i hosting jsou na vaše jméno a zdrojový kód dostanete. Nic vám nedržím jako rukojmí.' },
     { topic: 'technika', question: 'Budu si moct web upravovat sám?', answer: 'Ano. Texty, fotky, ceník, články nebo menu si změníte v jednoduché administraci. Na spuštění vám ji ukážu.' },
     { topic: 'technika', question: 'Bude web vidět na Googlu?', answer: 'Každý web má technické SEO v základu: rychlost, strukturovaná data, sitemapu a správné nadpisy. Pomůžu vám i se založením Google Business Profile, který je pro místní firmy nejdůležitější.' },
+    WEB_SECURITY_FAQ,
     { topic: 'technika', question: 'Děláte i e-shopy?', answer: 'Zatím se soustředím na prezentační weby, rezervace a poptávkové formuláře. Web ale stavím tak, aby se k němu dal e-shop později přidat.' },
-    { topic: 'obor', question: 'Umíte rezervace stolů nebo termínů?', answer: 'Ano. Rezervační systém s potvrzovacími e-maily a pozvánkou do kalendáře je součástí balíčku Web s rezervacemi.' },
-    { topic: 'obor', question: 'Jde na web dát denní menu, které si budu měnit sám?', answer: 'Ano, menu upravíte v administraci za minutu, i z mobilu.' },
+    ...LECTURE_FAQS,
   ] as const
 
   const faqIds: Record<string, number> = {}
@@ -148,89 +171,19 @@ export async function seedContent(payload: Payload) {
   log('FAQ hotové')
 
   // ---------- Služby ----------
-  await payload.create({
+  const webService = await payload.create({
     collection: 'services',
     data: {
-      title: 'Weby pro řemeslníky',
-      slug: 'weby-pro-remeslniky',
-      segment: 'remeslnici',
-      order: 1,
-      headline: 'Web pro řemeslníky, ze kterého vám zákazníci rovnou zavolají',
-      intro:
-        'Instalatéři, elektrikáři, truhláři, malíři, zedníci. Zákazník vás hledá na mobilu, často ve spěchu. Web mu musí za pár vteřin ukázat, co děláte, kde působíte a jak vám zavolat.',
-      shortDescription: 'Ukázky prací, oblast působnosti a tlačítko „Zavolat“ vždy po ruce. Pro instalatéry, elektrikáře, truhláře a další.',
-      painPoints: [
-        { text: 'Zakázky máte jen z doporučení a nevíte, jak získat nové.' },
-        { text: 'Na Googlu vás předbíhá konkurence s horší prací.' },
-        { text: 'Máte jen Facebook a lidé vás neberou vážně.' },
-        { text: 'Starý web se na mobilu načítá věčnost.' },
-      ],
-      features: [
-        { title: 'Galerie realizací', text: 'Fotky před a po prodají víc než jakýkoli text. Přidáte je sami z mobilu.' },
-        { title: 'Zavolat jedním palcem', text: 'Telefon je vidět na každé stránce, na mobilu jako lepicí tlačítko.' },
-        { title: 'Poptávkový formulář', text: 'Zákazník popíše práci a přiloží fotku. Poptávka vám přijde e-mailem.' },
-        { title: 'Místní SEO', text: 'Stránky pro města, kde působíte, napojení na Google Business Profile a Firmy.cz.' },
-        { title: 'Recenze od zákazníků', text: 'Hodnocení z Googlu přímo na webu, aby noví zákazníci věděli, že na vás je spoleh.' },
-        { title: 'Rychlost na mobilu', text: 'Web se načte i na horším signálu na stavbě.' },
-      ],
-      faqs: faqsFor('Kolik stojí web na míru?', 'Nemám fotky ani texty. Vadí to?', 'Bude web vidět na Googlu?'),
+      ...serviceData(WEB_SERVICE),
+      faqs: faqsFor(...WEB_SERVICE.faqQuestions),
     },
   })
-
   await payload.create({
     collection: 'services',
     data: {
-      title: 'Weby pro restaurace a kavárny',
-      slug: 'weby-pro-restaurace',
-      segment: 'gastro',
-      order: 2,
-      headline: 'Web pro restauraci, kde je menu, otevírací doba a rezervace na první pohled',
-      intro:
-        'Host chce vědět tři věci: co vaříte, kdy máte otevřeno a jestli bude místo. Všechno ostatní je bonus. Web pro restauraci nebo kavárnu stavím přesně kolem toho.',
-      shortDescription: 'Denní menu, které si měníte sami, rezervace stolů a otevírací doba, kterou Google ukáže ve vyhledávání.',
-      painPoints: [
-        { text: 'Denní menu posíláte jako fotku na Facebook a nikdo ho nenajde.' },
-        { text: 'Rezervace chodí telefonem ve špičce, kdy nemáte čas.' },
-        { text: 'Na Googlu je stará otevírací doba.' },
-        { text: 'Menu na webu je PDF, které se na mobilu nedá číst.' },
-      ],
-      features: [
-        { title: 'Denní a stálé menu', text: 'Upravíte ho v administraci za minutu. Čitelné na mobilu, žádné PDF.' },
-        { title: 'Rezervace stolů', text: 'Host si vybere čas a počet osob, vám přijde e-mail a záznam do kalendáře.' },
-        { title: 'Otevírací doba pro Google', text: 'Strukturovaná data, takže Google ukáže správné časy přímo ve výsledcích.' },
-        { title: 'Fotky, které dělají chuť', text: 'Optimalizované, aby se načítaly bleskově i ve velkém rozlišení.' },
-        { title: 'Akce a události', text: 'Degustace, živá hudba, sezónní menu. Vše na jednom místě.' },
-        { title: 'Napojení na rozvoz', text: 'Odkazy na Wolt, Bolt Food nebo vlastní objednávky.' },
-      ],
-      faqs: faqsFor('Umíte rezervace stolů nebo termínů?', 'Jde na web dát denní menu, které si budu měnit sám?', 'Kolik stojí web na míru?'),
-    },
-  })
-
-  await payload.create({
-    collection: 'services',
-    data: {
-      title: 'Weby pro služby a obchody',
-      slug: 'weby-pro-sluzby',
-      segment: 'sluzby',
-      order: 3,
-      headline: 'Web pro salon, studio nebo poradnu, kde si klient rovnou zarezervuje termín',
-      intro:
-        'Kadeřnictví, kosmetika, fyzioterapie, fitness, poradci, autoservisy. Klient chce vidět ceník a volný termín. Když to najde za pár vteřin, rezervuje si.',
-      shortDescription: 'Online rezervace termínů, přehledný ceník služeb a profil, který vzbudí důvěru. Pro salony, studia, poradce a servisy.',
-      painPoints: [
-        { text: 'Polovinu dne vyřizujete telefonáty kvůli termínům.' },
-        { text: 'Klienti se ptají na ceny, které nejsou nikde napsané.' },
-        { text: 'Platíte měsíčně za rezervační systém, který vypadá jako z roku 2010.' },
-      ],
-      features: [
-        { title: 'Online rezervace', text: 'Klient si vybere službu a volný čas. Potvrzení i připomínka chodí automaticky.' },
-        { title: 'Ceník služeb', text: 'Přehledně podle kategorií, upravíte ho sami.' },
-        { title: 'Představení týmu', text: 'Fotky a krátké profily lidí, ke kterým klient přijde.' },
-        { title: 'Dárkové poukazy', text: 'Formulář na objednání poukazu s platbou převodem.' },
-        { title: 'Recenze', text: 'Hodnocení z Googlu přímo na webu.' },
-        { title: 'Místní SEO', text: 'Aby vás našli lidé ve vaší čtvrti, když hledají „kadeřnictví poblíž“.' },
-      ],
-      faqs: faqsFor('Umíte rezervace stolů nebo termínů?', 'Budu si moct web upravovat sám?', 'Platím něco měsíčně?'),
+      ...serviceData(LECTURE_SERVICE),
+      body: LECTURE_SERVICE.body(),
+      faqs: faqsFor(...LECTURE_SERVICE.faqQuestions),
     },
   })
   log('Služby hotové')
@@ -240,6 +193,7 @@ export async function seedContent(payload: Payload) {
     collection: 'packages',
     data: {
       name: 'Vizitka',
+      category: 'web',
       price: 14900,
       priceFrom: true,
       deliveryDays: 7,
@@ -257,6 +211,7 @@ export async function seedContent(payload: Payload) {
     collection: 'packages',
     data: {
       name: 'Firemní web',
+      category: 'web',
       price: 29900,
       priceFrom: true,
       deliveryDays: 14,
@@ -277,6 +232,7 @@ export async function seedContent(payload: Payload) {
     collection: 'packages',
     data: {
       name: 'Web s rezervacemi',
+      category: 'web',
       price: 44900,
       priceFrom: true,
       deliveryDays: 21,
@@ -347,57 +303,40 @@ export async function seedContent(payload: Payload) {
     collection: 'categories',
     data: { title: 'Rady pro podnikatele', slug: 'rady', description: 'Praktické rady, jak získat zákazníky přes web a Google.' },
   })
+  const catSecurity = await payload.create({ collection: 'categories', data: SECURITY_CATEGORY })
   await payload.create({
     collection: 'categories',
     data: { title: 'Ceny a rozpočet', slug: 'ceny', description: 'Kolik co stojí a za co se vyplatí zaplatit.' },
   })
 
   const admin = (await payload.find({ collection: 'users', limit: 1 })).docs[0]
-  const servicesList = await payload.find({ collection: 'services', limit: 10 })
-  const craftService = servicesList.docs.find((s) => s.segment === 'remeslnici')
 
   await payload.create({
     collection: 'posts',
     data: {
-      title: 'Co musí mít web řemeslníka, aby z něj chodily zakázky',
-      slug: 'co-musi-mit-web-remeslnika',
-      excerpt: 'Sedm věcí, podle kterých se zákazník rozhodne, jestli vám zavolá, nebo odejde ke konkurenci.',
-      category: catTips.id,
+      title: SECURITY_POST.title,
+      slug: SECURITY_POST.slug,
+      excerpt: SECURITY_POST.excerpt,
+      category: catSecurity.id,
       author: admin?.id,
-      relatedService: craftService?.id,
       _status: 'published',
       publishedAt: new Date().toISOString(),
-      content: rt(`
-  Zákazník, který hledá instalatéra, nemá čas číst. Otevře web na mobilu, během pár vteřin se rozhodne a buď zavolá, nebo jde o výsledek níž. Tady je, co musí najít.
+      content: SECURITY_POST.content(),
+    },
+  })
 
-  ## 1. Telefon na každé stránce
-
-  Číslo musí být vidět bez scrollování a musí jít jedním dotykem vytočit. Na mobilu nejlépe jako tlačítko, které je pořád dole na obrazovce.
-
-  ## 2. Kde působíte
-
-  Napište konkrétní města a okresy. Zákazník z Kladna nechce volat, aby zjistil, že tam nejezdíte. A Google díky tomu ví, komu vás má ukázat.
-
-  ## 3. Fotky skutečné práce
-
-  Fotky z fotobanky poznají všichni. Fotka hotové koupelny z mobilu je důvěryhodnější než sebelepší ilustrace.
-
-  ## 4. Orientační ceny
-
-  Nemusíte psát přesný ceník. Stačí „výměna baterie od 900 Kč“ nebo „koupelna na klíč od 150 000 Kč“. Ušetří vám to telefonáty s lidmi, pro které jste moc drahý.
-
-  ## 5. Recenze
-
-  Tři až pět skutečných hodnocení z Googlu s celým jménem udělá víc než odstavec o tom, jak jste spolehliví.
-
-  ## 6. Rychlost
-
-  Pokud se web načítá déle než tři sekundy, polovina lidí odejde. Na stavbě se slabým signálem ještě dřív.
-
-  ## 7. Údaje o firmě
-
-  Jméno, IČO a sídlo musí být na webu ze zákona. A navíc dodávají důvěru: je jasné, že nejste anonym.
-      `),
+  await payload.create({
+    collection: 'posts',
+    data: {
+      title: GENERAL_WEB_POST.title,
+      slug: GENERAL_WEB_POST.slug,
+      excerpt: GENERAL_WEB_POST.excerpt,
+      category: catTips.id,
+      author: admin?.id,
+      relatedService: webService.id,
+      _status: 'published',
+      publishedAt: new Date(Date.now() - 3600000).toISOString(),
+      content: GENERAL_WEB_POST.content(),
     },
   })
 
@@ -405,6 +344,7 @@ export async function seedContent(payload: Payload) {
     collection: 'posts',
     data: {
       title: 'Web na míru, nebo stavebnice? Srovnání pro malou firmu',
+      relatedService: webService.id,
       slug: 'web-na-miru-nebo-stavebnice',
       excerpt: 'Kdy dává smysl Wix nebo Webnode a kdy se vyplatí zaplatit za web na míru. Srovnání ceny za pět let.',
       category: catTips.id,

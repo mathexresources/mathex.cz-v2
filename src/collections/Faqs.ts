@@ -7,6 +7,7 @@ export const FAQ_TOPICS = [
   { value: 'cena', label: 'Cena a platba' },
   { value: 'prubeh', label: 'Průběh spolupráce' },
   { value: 'technika', label: 'Technika a provoz' },
+  { value: 'prednasky', label: 'Přednášky' },
   { value: 'obor', label: 'Oborové' },
 ] as const
 

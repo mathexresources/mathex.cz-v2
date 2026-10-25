@@ -66,7 +66,7 @@ export const BookingSettings: GlobalConfig = {
           label: 'Místo / odkaz na schůzku',
           type: 'text',
           admin: {
-            description: 'Např. stálý odkaz na Google Meet nebo adresa kavárny. Pošle se v potvrzení.',
+            description: 'Např. stálý odkaz na Google Meet nebo adresa místa schůzky. Pošle se v potvrzení.',
           },
         },
       ],

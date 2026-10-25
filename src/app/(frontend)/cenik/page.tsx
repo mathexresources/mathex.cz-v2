@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { ClosingCta } from '@/components/ClosingCta'
 import { FaqList } from '@/components/FaqList'
@@ -12,7 +13,7 @@ import { buildMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = buildMetadata({
   title: 'Ceník tvorby webu',
-  description: 'Kolik stojí web na míru pro řemeslníka, restauraci nebo malou firmu. Pevné ceny, jasné termíny, žádné skryté poplatky.',
+  description: 'Kolik stojí web na míru. Pevné ceny, jasné termíny, žádné skryté poplatky. Přednášky o bezpečnosti podle domluvy.',
   path: '/cenik',
 })
 
@@ -28,13 +29,18 @@ const ALWAYS_INCLUDED = [
 ]
 
 export default async function PricingPage() {
-  const [packages, faqs, site] = await Promise.all([getPackages(), getFaqs(), getSiteSettings()])
+  const [packages, lecturePackages, faqs, site] = await Promise.all([
+    getPackages('web'),
+    getPackages('prednasky'),
+    getFaqs(),
+    getSiteSettings(),
+  ])
   const priceFaqs = faqs.filter((f) => f.topic === 'cena')
 
   return (
     <>
       <PageHeader
-        title="Ceník"
+        title="Ceník webů"
         intro={`Cenu znáte předem a nemění se. Zálohu 50 % platíte až po odsouhlasení návrhu. ${
           site.vatPayer ? 'Ceny jsou bez DPH.' : 'Nejsem plátce DPH, takže cena je konečná.'
         }`}
@@ -45,7 +51,18 @@ export default async function PricingPage() {
         <PackageList packages={packages} />
       </div>
 
-      <Section id="vzdy" title="V každém balíčku">
+      <Section id="prednasky" title="Přednášky o bezpečnosti">
+        {lecturePackages.length > 0 ? (
+          <PackageList packages={lecturePackages} />
+        ) : (
+          <p className="max-w-[60ch] text-pencil">
+            Délka i cena přednášky jsou podle domluvy.{' '}
+            <Link href="/kontakt?tema=prednaska">Napište mi, co potřebujete</Link>, a pošlu nabídku.
+          </p>
+        )}
+      </Section>
+
+      <Section id="vzdy" title="V každém webu">
         <ul className="ui grid gap-x-10 border-t border-line text-[1.05rem] sm:grid-cols-2">
           {ALWAYS_INCLUDED.map((item) => (
             <li key={item} className="flex gap-3 border-b border-line py-4">
@@ -67,8 +84,8 @@ export default async function PricingPage() {
         </Section>
       )}
 
-      <JsonLd data={offerCatalogSchema(packages)} />
-      <ClosingCta title="Nevíte, který balíček vybrat?" phone={site.phone} />
+      <JsonLd data={offerCatalogSchema([...packages, ...lecturePackages])} />
+      <ClosingCta title="Nevíte, co vybrat?" phone={site.phone} />
     </>
   )
 }

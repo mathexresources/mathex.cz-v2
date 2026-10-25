@@ -13,6 +13,7 @@ import { Section } from '@/components/Section'
 import { getPackages, getProjects, getServiceBySlug, getSiteSettings } from '@/lib/data'
 import { faqSchema, serviceSchema } from '@/lib/schema'
 import { buildMetadata } from '@/lib/seo'
+import { packageCategoryFor } from '@/lib/segments'
 import type { Faq } from '@/payload-types'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -34,9 +35,11 @@ export default async function ServicePage({ params }: Props) {
   const service = await getServiceBySlug(slug)
   if (!service) notFound()
 
+  const isLecture = service.segment === 'bezpecnost'
   const [projects, packages, site] = await Promise.all([
-    getProjects({ segment: service.segment }),
-    getPackages(),
+    // Weby na míru ukazují celé portfolio, přednášky žádné weby
+    isLecture ? Promise.resolve([]) : getProjects(service.segment === 'weby' ? {} : { segment: service.segment }),
+    getPackages(packageCategoryFor(service.segment)),
     getSiteSettings(),
   ])
   const faqs = (service.faqs ?? []).filter((f): f is Faq => typeof f === 'object' && f !== null)
@@ -52,12 +55,25 @@ export default async function ServicePage({ params }: Props) {
         ]}
       >
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/rezervace" className="btn btn-primary">
-            Rezervovat konzultaci zdarma
-          </Link>
-          <Link href="#cenik" className="btn btn-secondary">
-            Zobrazit ceny
-          </Link>
+          {isLecture ? (
+            <>
+              <Link href="/kontakt?tema=prednaska" className="btn btn-primary">
+                Domluvit přednášku
+              </Link>
+              <Link href="/rezervace" className="btn btn-secondary">
+                Probrat to po telefonu
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/rezervace" className="btn btn-primary">
+                Rezervovat konzultaci zdarma
+              </Link>
+              <Link href="#cenik" className="btn btn-secondary">
+                Zobrazit ceny
+              </Link>
+            </>
+          )}
         </div>
       </PageHeader>
 
@@ -74,7 +90,7 @@ export default async function ServicePage({ params }: Props) {
       )}
 
       {service.features && service.features.length > 0 && (
-        <Section id="co-umi" title="Co váš nový web bude umět">
+        <Section id="co-umi" title={isLecture ? 'O čem mluvím' : 'Co váš nový web bude umět'}>
           <dl className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {service.features.map((f) => (
               <div key={f.id ?? f.title} className="border-t-2 border-ink pt-4">
@@ -93,13 +109,24 @@ export default async function ServicePage({ params }: Props) {
       )}
 
       {projects.length > 0 && (
-        <Section id="ukazky" title="Ukázky z oboru" link={{ href: '/portfolio', label: 'Celé portfolio' }}>
+        <Section id="ukazky" title="Ukázky prací" link={{ href: '/portfolio', label: 'Celé portfolio' }}>
           <ProjectList projects={projects.slice(0, 3)} />
         </Section>
       )}
 
-      <Section id="cenik" title="Ceny" link={{ href: '/cenik', label: 'Podrobný ceník' }}>
-        <PackageList packages={packages} />
+      <Section id="cenik" title="Cena" link={isLecture ? undefined : { href: '/cenik', label: 'Podrobný ceník' }}>
+        {packages.length > 0 ? (
+          <PackageList packages={packages} />
+        ) : (
+          <div className="flex max-w-3xl flex-col gap-5 border-l-4 border-tape bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-pencil">
+              Délka i cena jsou podle domluvy – záleží na publiku, tématech a místě. Napište mi, co potřebujete, a pošlu nabídku.
+            </p>
+            <Link href="/kontakt?tema=prednaska" className="btn btn-primary flex-none">
+              Poptat přednášku
+            </Link>
+          </div>
+        )}
       </Section>
 
       {faqs.length > 0 && (

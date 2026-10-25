@@ -56,8 +56,8 @@ export default async function HomePage() {
               <Link href="/rezervace" className="btn btn-primary">
                 Rezervovat konzultaci zdarma
               </Link>
-              <Link href="/portfolio" className="btn btn-secondary">
-                Prohlédnout ukázky
+              <Link href="/sluzby/prednasky-bezpecnost-na-internetu" className="btn btn-secondary">
+                Přednášky o bezpečnosti
               </Link>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default async function HomePage() {
 
       {/* Pro koho */}
       {services.length > 0 && (
-        <Section id="sluzby" title="Pro koho dělám weby">
+        <Section id="sluzby" title="Co dělám">
           <ul className="border-t border-line">
             {services.map((s) => (
               <li key={s.id} className="group relative border-b border-line">
@@ -103,7 +103,7 @@ export default async function HomePage() {
 
       {/* Postup */}
       {home.process && home.process.length > 0 && (
-        <Section id="postup" title="Jak to probíhá">
+        <Section id="postup" title="Jak vzniká web">
           <ol className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
             {home.process.map((step, i) => (
               <li key={step.id ?? i} className="flex flex-col bg-paper p-6">
@@ -123,8 +123,8 @@ export default async function HomePage() {
       {packages.length > 0 && (
         <Section
           id="cenik"
-          title="Kolik to stojí"
-          intro="Pevná cena předem, žádné hodinovky. Doménu, hosting i kód máte na sebe, nic vám nedržím jako rukojmí."
+          title="Kolik stojí web"
+          intro="Pevná cena předem, žádné hodinovky. Doménu, hosting i kód máte na sebe, nic vám nedržím jako rukojmí. Přednášky naceňuji podle domluvy."
           link={{ href: '/cenik', label: 'Podrobný ceník' }}
         >
           <PackageList packages={packages} />

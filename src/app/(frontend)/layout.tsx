@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings()
   const description =
     site.defaultDescription ||
-    'Weby na míru pro řemeslníky, restaurace a malé firmy. Rychlé, moderní a hotové do dvou týdnů.'
+    'Rychlé a bezpečné weby na míru a přednášky o bezpečnosti na internetu pro školy, firmy i veřejnost.'
   return {
     metadataBase: new URL(SITE_URL),
     title: {

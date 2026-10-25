@@ -251,7 +251,7 @@ export interface Media {
 export interface Service {
   id: number;
   title: string;
-  segment: 'remeslnici' | 'gastro' | 'sluzby' | 'jine';
+  segment: 'weby' | 'bezpecnost' | 'remeslnici' | 'gastro' | 'sluzby' | 'jine';
   headline: string;
   intro: string;
   shortDescription: string;
@@ -311,7 +311,7 @@ export interface Faq {
    * Prostý text – používá se i pro rozšířené výsledky Google (FAQ).
    */
   answer: string;
-  topic: 'cena' | 'prubeh' | 'technika' | 'obor';
+  topic: 'cena' | 'prubeh' | 'technika' | 'prednasky' | 'obor';
   showOnFaqPage?: boolean | null;
   order?: number | null;
   updatedAt: string;
@@ -325,7 +325,7 @@ export interface Project {
   id: number;
   title: string;
   client: string;
-  segment: 'remeslnici' | 'gastro' | 'sluzby' | 'jine';
+  segment: 'weby' | 'bezpecnost' | 'remeslnici' | 'gastro' | 'sluzby' | 'jine';
   /**
    * Jedna až dvě věty do výpisu.
    */
@@ -439,6 +439,10 @@ export interface Testimonial {
 export interface Package {
   id: number;
   name: string;
+  /**
+   * Na stránce služby se ukáže jen ceník, který k ní patří.
+   */
+  category: 'web' | 'prednasky';
   price: number;
   priceFrom?: boolean | null;
   deliveryDays?: number | null;
@@ -818,6 +822,7 @@ export interface ProjectsSelect<T extends boolean = true> {
  */
 export interface PackagesSelect<T extends boolean = true> {
   name?: T;
+  category?: T;
   price?: T;
   priceFrom?: T;
   deliveryDays?: T;
@@ -1200,7 +1205,7 @@ export interface BookingSetting {
         durationMin: number;
         description?: string | null;
         /**
-         * Např. stálý odkaz na Google Meet nebo adresa kavárny. Pošle se v potvrzení.
+         * Např. stálý odkaz na Google Meet nebo adresa místa schůzky. Pošle se v potvrzení.
          */
         location?: string | null;
         id?: string | null;

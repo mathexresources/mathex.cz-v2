@@ -13,10 +13,12 @@ export function ContactForm({
   privacyHref,
   source,
   turnstileSiteKey,
+  initialMessage,
 }: {
   privacyHref: string
   source: string
   turnstileSiteKey?: string
+  initialMessage?: string
 }) {
   const [state, action, pending] = useActionState(sendInquiry, initial)
   const v = state.values ?? {}
@@ -42,11 +44,12 @@ export function ContactForm({
       </div>
       <Field
         label="Co potřebujete"
-        name="message" defaultValue={v.message}
+        name="message"
+        defaultValue={v.message ?? initialMessage}
         textarea
         required
         error={state.errors?.message}
-        hint="Čím se zabýváte, jestli už máte web a co by měl umět."
+        hint="U webu: čím se zabýváte a co by měl umět. U přednášky: pro koho, kolik lidí, kde a kdy."
       />
       <input type="hidden" name="source" value={source} />
       <Consent privacyHref={privacyHref} error={state.errors?.consent} />

@@ -20,7 +20,7 @@ export const Services: CollectionConfig = {
   fields: [
     {
       name: 'title',
-      label: 'Název (např. Weby pro řemeslníky)',
+      label: 'Název (např. Weby na míru)',
       type: 'text',
       required: true,
     },

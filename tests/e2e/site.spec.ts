@@ -3,8 +3,8 @@ import { expect, test } from '@playwright/test'
 const PAGES = [
   '/',
   '/sluzby',
-  '/sluzby/weby-pro-remeslniky',
-  '/sluzby/weby-pro-restaurace',
+  '/sluzby/weby-na-miru',
+  '/sluzby/prednasky-bezpecnost-na-internetu',
   '/portfolio',
   '/portfolio/bistro-na-rohu',
   '/cenik',
@@ -13,7 +13,8 @@ const PAGES = [
   '/kontakt',
   '/rezervace',
   '/blog',
-  '/blog/co-musi-mit-web-remeslnika',
+  '/blog/co-musi-mit-web-firmy',
+  '/blog/jak-poznat-podvodny-email',
   '/blog/kategorie/rady',
   '/ochrana-osobnich-udaju',
   '/cookies',
@@ -50,17 +51,17 @@ test('strukturovaná data jsou platný JSON', async ({ page }) => {
   )
   expect(types).toEqual(expect.arrayContaining(['ProfessionalService', 'WebSite', 'Person', 'FAQPage', 'OfferCatalog']))
 
-  await page.goto('/blog/co-musi-mit-web-remeslnika')
+  await page.goto('/blog/co-musi-mit-web-firmy')
   const article = await page.locator('script[type="application/ld+json"]').evaluateAll((els) =>
     els.map((el) => JSON.parse(el.textContent || '{}')).filter((d) => d['@type'] === 'BlogPosting'),
   )
-  expect(article[0].headline).toBe('Co musí mít web řemeslníka, aby z něj chodily zakázky')
+  expect(article[0].headline).toBe('Co musí mít web malé firmy, aby přiváděl zákazníky')
 })
 
 test('sitemap, robots, RSS a obrázek pro sdílení', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text()
-  expect(sitemap).toContain('/sluzby/weby-pro-remeslniky')
-  expect(sitemap).toContain('/blog/co-musi-mit-web-remeslnika')
+  expect(sitemap).toContain('/sluzby/prednasky-bezpecnost-na-internetu')
+  expect(sitemap).toContain('/blog/jak-poznat-podvodny-email')
 
   // localhost se nesmí indexovat
   expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /')
@@ -108,4 +109,22 @@ test('mobil: lepicí lišta se Zavolat a Rezervovat', async ({ browser }) => {
   await expect(page.getByRole('link', { name: 'Zavolat' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Rezervovat konzultaci', exact: true }).last()).toBeVisible()
   await page.close()
+})
+
+test('přednášky: stránka, ceník podle domluvy a předvyplněná poptávka', async ({ page }) => {
+  await page.goto('/sluzby/prednasky-bezpecnost-na-internetu')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('phishingu a OSINT')
+  await expect(page.getByText('OSINT – co o vás ví internet')).toBeVisible()
+  await expect(page.getByText('Délka i cena jsou podle domluvy').first()).toBeVisible()
+
+  await page.getByRole('link', { name: 'Domluvit přednášku' }).first().click()
+  await expect(page).toHaveURL(/\/kontakt\?tema=prednaska/)
+  await expect(page.getByLabel(/Co potřebujete/)).toHaveValue(/přednášku o bezpečnosti/)
+
+  await page.goto('/cenik')
+  await expect(page.getByRole('heading', { name: 'Přednášky o bezpečnosti' })).toBeVisible()
+
+  // Na stránce webů tlačítko na přednášku není
+  await page.goto('/sluzby/weby-na-miru')
+  await expect(page.getByRole('link', { name: 'Domluvit přednášku' })).toHaveCount(0)
 })

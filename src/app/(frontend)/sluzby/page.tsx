@@ -7,9 +7,9 @@ import { getServices, getSiteSettings } from '@/lib/data'
 import { buildMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Služby – weby na míru podle oboru',
+  title: 'Služby – weby na míru a přednášky o bezpečnosti',
   description:
-    'Weby pro řemeslníky, restaurace, kavárny, salony a další malé firmy. Každý obor potřebuje něco jiného – podívejte se, co dostanete.',
+    'Rychlé a bezpečné weby na míru pro firmy, živnostníky i organizace a přednášky o bezpečnosti na internetu pro školy, firmy a veřejnost.',
   path: '/sluzby',
 })
 
@@ -18,8 +18,8 @@ export default async function ServicesPage() {
   return (
     <>
       <PageHeader
-        title="Weby podle toho, co děláte"
-        intro="Řemeslník potřebuje, aby mu zákazník rychle zavolal. Restaurace potřebuje menu a rezervace stolů. Vyberte si svůj obor."
+        title="Co pro vás můžu udělat"
+        intro="Postavím vám rychlý a bezpečný web na míru. A vašim lidem ukážu, jak se na internetu nenechat napálit."
         crumbs={[{ name: 'Služby', path: '/sluzby' }]}
       />
       <div className="container-site mt-14">

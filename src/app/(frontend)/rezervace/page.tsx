@@ -29,7 +29,7 @@ export default async function BookingPage({ searchParams }: Props) {
     <>
       <PageHeader
         title="Rezervace konzultace"
-        intro="Konzultace je zdarma a k ničemu vás nezavazuje. Probereme, co děláte, co od webu čekáte a kolik to bude stát."
+        intro="Konzultace je zdarma a k ničemu vás nezavazuje. Probereme váš web nebo přednášku, co od toho čekáte a kolik to bude stát."
         crumbs={[{ name: 'Rezervace', path: '/rezervace' }]}
       />
       <div className="container-site mt-14 grid gap-16 lg:grid-cols-[1fr_18rem]">
@@ -53,8 +53,8 @@ export default async function BookingPage({ searchParams }: Props) {
             <h2 className="text-[1.1rem]">Co si připravit</h2>
             <ul className="mt-3 list-[square] space-y-1.5 pl-5 text-pencil">
               <li>Čím se zabýváte a pro koho</li>
-              <li>Weby, které se vám líbí</li>
-              <li>Odkaz na současný web nebo profil</li>
+              <li>U webu: weby, které se vám líbí, a odkaz na ten současný</li>
+              <li>U přednášky: publikum, počet lidí a místo</li>
               <li>Představu o termínu a rozpočtu</li>
             </ul>
           </div>

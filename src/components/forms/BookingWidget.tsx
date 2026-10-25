@@ -196,7 +196,7 @@ export function BookingWidget({
             error={state.errors?.phone}
           />
           <Field label="Firma" name="company" autoComplete="organization" defaultValue={v.company} />
-          <Field label="Obor" name="field" placeholder="např. instalatér, bistro, kadeřnictví" defaultValue={v.field} />
+          <Field label="Čím se zabýváte" name="field" placeholder="např. účetní kancelář, škola, e-shop" defaultValue={v.field} />
           <Field label="Současný web" name="website" type="url" inputMode="url" placeholder="https://" defaultValue={v.website} />
         </div>
         <Field

@@ -10,6 +10,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { seedIfEmpty } from './content'
+import { USER_BIO } from './defaults'
 
 const payload = await getPayload({ config })
 
@@ -23,7 +24,7 @@ if (users.totalDocs === 0) {
       email,
       password,
       name: process.env.ADMIN_NAME || 'Jméno Příjmení',
-      bio: 'Navrhuji a programuji rychlé weby pro řemeslníky, restaurace a malé firmy.',
+      bio: USER_BIO,
     },
   })
   payload.logger.info(

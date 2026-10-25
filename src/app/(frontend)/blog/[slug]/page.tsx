@@ -94,7 +94,7 @@ export default async function PostPage({ params }: Props) {
         <aside className="mt-16 max-w-[68ch] border-t-2 border-ink pt-6">
           <p className="ui font-semibold">{author?.name ?? site.ownerName}</p>
           <p className="mt-1 text-pencil">
-            {author?.bio ?? 'Navrhuji a programuji weby pro řemeslníky, restaurace a malé firmy.'}{' '}
+            {author?.bio ?? 'Navrhuji a programuji weby na míru a přednáším o bezpečnosti na internetu.'}{' '}
             <Link href="/o-mne">Více o mně</Link>
           </p>
         </aside>

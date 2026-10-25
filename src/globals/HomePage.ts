@@ -15,7 +15,7 @@ export const HomePage: GlobalConfig = {
       label: 'Hlavní nadpis',
       type: 'textarea',
       required: true,
-      defaultValue: 'Weby pro řemeslníky, restaurace a malé firmy. Hotové do dvou týdnů.',
+      defaultValue: 'Rychlé a bezpečné weby na míru. A přednášky o tom, jak se na internetu nenechat napálit.',
     },
     {
       name: 'heroText',
@@ -23,7 +23,7 @@ export const HomePage: GlobalConfig = {
       type: 'textarea',
       required: true,
       defaultValue:
-        'Navrhnu a naprogramuju web, který se načte dřív, než zákazník stihne odejít ke konkurenci. Žádné šablony, žádné měsíční poplatky za stavebnici.',
+        'Navrhnu a naprogramuju web pro vaši firmu, projekt nebo organizaci – bez šablon, s pevnou cenou a hotový v řádu týdnů.',
     },
     {
       name: 'process',
@@ -40,14 +40,14 @@ export const HomePage: GlobalConfig = {
       name: 'closingTitle',
       label: 'Nadpis výzvy na konci stránky',
       type: 'text',
-      defaultValue: 'Pojďme se na váš web podívat spolu',
+      defaultValue: 'Pojďme to probrat',
     },
     {
       name: 'closingText',
       label: 'Text výzvy',
       type: 'textarea',
       defaultValue:
-        'Úvodní konzultace trvá 30 minut a je zdarma. Řeknete mi, co děláte a co od webu chcete, já vám řeknu, co to bude stát a kdy to bude hotové.',
+        'Úvodní konzultace trvá 30 minut a je zdarma. Řeknu vám, co to obnáší, kolik to stojí a kdy to stihneme.',
     },
   ],
 }

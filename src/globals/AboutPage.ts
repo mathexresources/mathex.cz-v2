@@ -15,7 +15,7 @@ export const AboutPage: GlobalConfig = {
       label: 'Nadpis',
       type: 'text',
       required: true,
-      defaultValue: 'Jsem vývojář, který píše weby pro lidi, co mají plné ruce práce',
+      defaultValue: 'Programuju weby a učím lidi, jak být na internetu v bezpečí',
     },
     { name: 'photo', label: 'Fotka', type: 'upload', relationTo: 'media' },
     { name: 'body', label: 'Text', type: 'richText' },

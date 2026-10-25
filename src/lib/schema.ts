@@ -129,7 +129,7 @@ export function serviceSchema(service: Service, packages: Package[]) {
     '@type': 'Service',
     name: service.title,
     description: service.shortDescription,
-    serviceType: 'Tvorba webových stránek',
+    serviceType: service.segment === 'bezpecnost' ? 'Přednášky a školení o bezpečnosti na internetu' : 'Tvorba webových stránek',
     provider: { '@id': ORG_ID },
     areaServed: { '@type': 'Country', name: 'Česko' },
     url: absoluteUrl(`/sluzby/${service.slug}`),
