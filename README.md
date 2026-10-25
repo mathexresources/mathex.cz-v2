@@ -50,6 +50,17 @@ Obraz se při každém pushi do `main` postaví na GitHubu pro amd64 i arm64 a n
 **Požadavky:** Raspberry Pi 4 nebo 5 se 4 GB RAM a víc, 64bit systém (`uname -m` vypíše `aarch64`),
 Docker s Compose. Doporučuju SSD místo SD karty – databáze SD kartu časem opotřebuje.
 
+### Rychlá instalace (jeden příkaz)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mathexresources/mathex.cz-v2/main/scripts/install.sh | bash
+```
+
+Skript zkontroluje systém, stáhne kód do `~/mathex`, vytvoří `.env` s náhodnými hesly, spustí web
+a vypíše adresu (např. `http://192.168.0.101:3000`). Stejný příkaz slouží i k aktualizaci.
+
+### Ruční instalace
+
 ### 1. Stažení a nastavení
 
 ```bash
