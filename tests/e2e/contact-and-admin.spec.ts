@@ -12,7 +12,7 @@ test('kontaktní formulář uloží poptávku a pošle dva e-maily', async ({ pa
   await page.getByLabel('Jméno').fill('Jana Nováková')
   await page.getByLabel('E-mail').fill('jana@example.com')
   await page.getByLabel(/Představa o rozpočtu/).fill('do 30 000 Kč')
-  await page.getByLabel(/Co potřebujete/).fill('Web pro kavárnu s denním menu.')
+  await page.getByLabel(/Co by měl web umět/).fill('Web pro kavárnu s denním menu.')
   await page.getByRole('checkbox', { name: /Souhlasím/ }).check()
   await waitLikeHuman(page)
   await page.getByRole('button', { name: 'Odeslat zprávu' }).click()
@@ -24,16 +24,21 @@ test('kontaktní formulář uloží poptávku a pošle dva e-maily', async ({ pa
   expect(owner.replyTo).toContain('jana@example.com')
   expect(owner.text).toContain('Web pro kavárnu s denním menu.')
   expect(owner.text).toContain('do 30 000 Kč')
+  expect(owner.text).toContain('Téma: Web')
   expect(client.subject).toMatch(/^Vaše zpráva pro/)
 })
 
-test('neúplný kontaktní formulář zachová vyplněný text', async ({ page }) => {
+test('neúplný kontaktní formulář zachová vyplněný text i zvolené téma', async ({ page }) => {
   await page.goto('/kontakt')
-  await page.getByLabel(/Co potřebujete/).fill('Dlouhý text, o který nechci přijít.')
+  await page.getByRole('radio', { name: 'Přednáška' }).check({ force: true })
+  await page.getByLabel(/Pro koho a kolik lidí/).fill('30 učitelů')
+  await page.getByLabel(/Co vás zajímá/).fill('Dlouhý text, o který nechci přijít.')
   await waitLikeHuman(page)
   await page.getByRole('button', { name: 'Odeslat zprávu' }).click()
   await expect(page.getByText('Napište své jméno.')).toBeVisible()
-  await expect(page.getByLabel(/Co potřebujete/)).toHaveValue('Dlouhý text, o který nechci přijít.')
+  await expect(page.getByRole('radio', { name: 'Přednáška' })).toBeChecked()
+  await expect(page.getByLabel(/Pro koho a kolik lidí/)).toHaveValue('30 učitelů')
+  await expect(page.getByLabel(/Co vás zajímá/)).toHaveValue('Dlouhý text, o který nechci přijít.')
   expect(await getMail()).toHaveLength(0)
 })
 

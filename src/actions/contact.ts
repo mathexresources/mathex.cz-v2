@@ -12,6 +12,8 @@ export type ContactState = {
   values?: Record<string, string>
 }
 
+const TOPIC_LABELS: Record<string, string> = { web: 'Web', prednaska: 'Přednáška', jine: 'Něco jiného' }
+
 export async function sendInquiry(_prev: ContactState, form: FormData): Promise<ContactState> {
   const ip = await clientIp()
   if (!rateLimit(`inquiry:${ip}`, 5, 60 * 60 * 1000)) {
@@ -24,6 +26,8 @@ export async function sendInquiry(_prev: ContactState, form: FormData): Promise<
     return { status: 'error', message: 'Ověření, že nejste robot, se nepovedlo. Obnovte stránku a zkuste to znovu.' }
   }
 
+  const topic = TOPIC_LABELS[String(form.get('topic'))] ? String(form.get('topic')) : 'jine'
+  const audience = clean(form.get('audience'), 200)
   const data = {
     name: clean(form.get('name'), 120),
     email: clean(form.get('email'), 200).toLowerCase(),
@@ -42,7 +46,13 @@ export async function sendInquiry(_prev: ContactState, form: FormData): Promise<
   if (data.message.length < 10) errors.message = 'Napište pár slov o tom, co potřebujete.'
   if (!data.consent) errors.consent = 'Bez souhlasu vám nemůžu odpovědět.'
   const { consent: _consent, ...values } = data
-  if (Object.keys(errors).length) return { status: 'error', errors, values, message: 'Ve formuláři něco chybí.' }
+  if (Object.keys(errors).length) {
+    return { status: 'error', errors, values: { ...values, topic, audience }, message: 'Ve formuláři něco chybí.' }
+  }
+
+  // Téma a publikum se ukládají do zprávy, ať je v administraci a v e-mailu všechno pohromadě
+  const header = [`Téma: ${TOPIC_LABELS[topic]}`, audience && `Pro koho: ${audience}`].filter(Boolean).join('\n')
+  data.message = `${header}\n\n${data.message}`
 
   const payload = await getPayloadClient()
   const doc = await payload.create({

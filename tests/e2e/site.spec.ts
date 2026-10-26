@@ -28,6 +28,8 @@ test('všechny stránky se načtou bez chyb, mají titulek, popis, canonical a j
   for (const path of PAGES) {
     const res = await page.goto(path)
     expect(res?.status(), path).toBe(200)
+    // nic nesmí přetékat do strany
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true)
     await expect(page, path).toHaveTitle(/.{10,}/)
     expect(await page.locator('meta[name="description"]').getAttribute('content'), path).toBeTruthy()
     expect(await page.locator('link[rel="canonical"]').getAttribute('href'), path).toMatch(/^http:\/\/localhost:\d+/)
@@ -108,6 +110,13 @@ test('mobil: lepicí lišta se Zavolat a Rezervovat', async ({ browser }) => {
   await page.goto('/')
   await expect(page.getByRole('link', { name: 'Zavolat' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Rezervovat konzultaci', exact: true }).last()).toBeVisible()
+
+  // na úzkém telefonu nic nepřetéká do strany
+  await page.setViewportSize({ width: 320, height: 640 })
+  for (const path of PAGES) {
+    await page.goto(path)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true)
+  }
   await page.close()
 })
 
@@ -119,7 +128,8 @@ test('přednášky: stránka, ceník podle domluvy a předvyplněná poptávka',
 
   await page.getByRole('link', { name: 'Domluvit přednášku' }).first().click()
   await expect(page).toHaveURL(/\/kontakt\?tema=prednaska/)
-  await expect(page.getByLabel(/Co potřebujete/)).toHaveValue(/přednášku o bezpečnosti/)
+  await expect(page.getByRole('radio', { name: 'Přednáška' })).toBeChecked()
+  await expect(page.getByLabel(/Pro koho a kolik lidí/)).toBeVisible()
 
   await page.goto('/cenik')
   await expect(page.getByRole('heading', { name: 'Přednášky o bezpečnosti' })).toBeVisible()

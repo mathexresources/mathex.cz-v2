@@ -16,7 +16,8 @@ export function FormGuard({ siteKey }: { siteKey?: string }) {
   return (
     <>
       <input type="hidden" name="started_at" value={startedAt} />
-      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      {/* sr-only místo posunu mimo obrazovku – posun o -9999 px umí v Safari roztáhnout stránku do strany */}
+      <div aria-hidden="true" className="sr-only">
         <label>
           Nevyplňujte
           <input type="text" name="company_website" tabIndex={-1} autoComplete="off" defaultValue="" />
