@@ -42,7 +42,7 @@ export default async function BookingPage({ searchParams }: Props) {
               initialMessage={pkg ? `Zajímá mě balíček ${pkg}.` : undefined}
             />
           ) : (
-            <p className="ui border-l-4 border-accent bg-surface p-5">
+            <p className="ui border-l-4 border-tape bg-surface p-5">
               Online rezervace jsou teď vypnuté. Napište mi přes <Link href="/kontakt">kontaktní formulář</Link>
               {site.phone ? ` nebo zavolejte na ${site.phone}` : ''}.
             </p>

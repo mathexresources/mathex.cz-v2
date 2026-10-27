@@ -118,7 +118,7 @@ export default async function ServicePage({ params }: Props) {
         {packages.length > 0 ? (
           <PackageList packages={packages} />
         ) : (
-          <div className="flex max-w-3xl flex-col gap-5 border-l-4 border-accent bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex max-w-3xl flex-col gap-5 border-l-4 border-tape bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-pencil">
               Délka i cena jsou podle domluvy – záleží na publiku, tématech a místě. Napište mi, co potřebujete, a pošlu nabídku.
             </p>

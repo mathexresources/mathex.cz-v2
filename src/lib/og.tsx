@@ -10,7 +10,7 @@ const FONT_PATH = path.join(process.cwd(), 'assets/og-bold.ttf')
 async function loadFonts() {
   try {
     const file = await readFile(FONT_PATH)
-    return [{ name: 'Archivo', data: new Uint8Array(file).buffer as ArrayBuffer, weight: 700 as const, style: 'normal' as const }]
+    return [{ name: 'Bricolage', data: new Uint8Array(file).buffer as ArrayBuffer, weight: 700 as const, style: 'normal' as const }]
   } catch {
     return []
   }
@@ -29,41 +29,32 @@ export async function renderOg({ title, label, brand }: { title: string; label?:
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '72px 80px',
-          background: '#10302B',
-          color: '#ECEEE6',
-          fontFamily: 'Archivo',
+          background: '#172440',
+          backgroundImage:
+            'linear-gradient(to right, rgba(246,247,244,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(246,247,244,0.07) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          color: '#F6F7F4',
+          fontFamily: 'Bricolage',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 34 }}>
-          <svg width="40" height="40" viewBox="0 0 24 24">
-            {Array.from({ length: 8 }, (_, i) => (
-              <circle
-                key={i}
-                cx={12 + 4.6 * Math.cos((i / 8) * Math.PI * 2)}
-                cy={12 + 4.6 * Math.sin((i / 8) * Math.PI * 2)}
-                r="5.6"
-                fill="none"
-                stroke="#B496F0"
-                strokeWidth="1.1"
-              />
-            ))}
-          </svg>
+          <div style={{ width: 14, height: 34, background: '#F2C12E' }} />
           {brand}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {label && <div style={{ fontSize: 30, color: '#B496F0' }}>{label}</div>}
+          {label && <div style={{ fontSize: 30, color: '#F2C12E' }}>{label}</div>}
           <div
             style={{
-              fontSize: title.length > 60 ? 48 : 60,
-              lineHeight: 1.08,
-              letterSpacing: '-0.01em',
+              fontSize: title.length > 60 ? 60 : 76,
+              lineHeight: 1.05,
+              letterSpacing: '-0.03em',
               maxWidth: 1000,
             }}
           >
             {title}
           </div>
         </div>
-        <div style={{ display: 'flex', height: 6, width: '100%', backgroundImage: 'linear-gradient(to right, #4DB8AC, #B496F0)' }} />
+        <div style={{ display: 'flex', height: 8, width: 240, background: '#F2C12E' }} />
       </div>
     ),
     { ...OG_SIZE, fonts: fonts.length ? fonts : undefined },

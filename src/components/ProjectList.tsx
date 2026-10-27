@@ -28,7 +28,7 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
                 className="aspect-[16/10] h-auto w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.015]"
               />
             ) : (
-              <div className="hatch aspect-[16/10]" />
+              <div className="blueprint-grid aspect-[16/10]" />
             )}
           </div>
 
@@ -37,11 +37,11 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
               {p.client}
               {p.segment ? `, ${segmentLabel(p.segment).toLowerCase()}` : ''}
               {p.isDemo && (
-                <span className="ml-2 rounded-[2px] border border-pencil px-1.5 py-0.5 text-[0.8rem]">ukázka</span>
+                <span className="ml-2 rounded-sm border border-pencil px-1.5 py-0.5 text-[0.8rem]">ukázka</span>
               )}
             </p>
             <H className="mt-2 text-[1.75rem] leading-tight">
-              <Link href={`/portfolio/${p.slug}`} className="no-underline after:absolute after:inset-0 hover:underline hover:decoration-accent hover:decoration-2">
+              <Link href={`/portfolio/${p.slug}`} className="no-underline after:absolute after:inset-0 hover:underline hover:decoration-tape hover:decoration-2">
                 {p.title}
               </Link>
             </H>

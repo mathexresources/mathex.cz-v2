@@ -4,9 +4,9 @@ export const metadata = { title: 'Stránka nenalezena', robots: { index: false }
 
 export default function NotFound() {
   return (
-    <section className="hatch border-b border-line">
+    <section className="blueprint-grid border-b border-line">
       <div className="container-site py-20 sm:py-28">
-        <p className="ui text-[clamp(5rem,18vw,12rem)] font-bold leading-none tracking-[-0.05em] text-accent [-webkit-text-stroke:2px_var(--color-ink)]">
+        <p className="ui text-[clamp(5rem,18vw,12rem)] font-bold leading-none tracking-[-0.05em] text-tape [-webkit-text-stroke:2px_var(--color-ink)]">
           404
         </p>
         <h1 className="mt-6 max-w-[18ch]">Tahle stránka na výkresu chybí</h1>

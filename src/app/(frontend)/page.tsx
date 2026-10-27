@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { ClosingCta } from '@/components/ClosingCta'
 import { FaqList } from '@/components/FaqList'
-import { GuillocheBand, GuillocheMedallion } from '@/components/Guilloche'
 import { JsonLd } from '@/components/JsonLd'
 import { PackageList } from '@/components/PackageList'
 import { ProjectList } from '@/components/ProjectList'
@@ -48,11 +47,11 @@ export default async function HomePage() {
   return (
     <>
       {/* Úvod */}
-      <section className="relative">
-        <div className="container-site grid gap-10 pb-12 pt-12 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-16 lg:pb-16 lg:pt-20 xl:grid-cols-[minmax(0,1fr)_27rem]">
-          <div className="min-w-0">
-            <h1 className="max-w-[19ch]">{home.heroTitle}</h1>
-            <p className="mt-6 max-w-[56ch] text-[1.1875rem] leading-relaxed text-pencil">{home.heroText}</p>
+      <section className="blueprint-grid border-b border-line">
+        <div className="container-site grid gap-12 py-14 sm:py-20 lg:grid-cols-[1.35fr_1fr] lg:items-end lg:gap-16 lg:py-24">
+          <div>
+            <h1 className="max-w-[17ch]">{home.heroTitle}</h1>
+            <p className="mt-6 max-w-[54ch] text-[1.2rem] text-pencil">{home.heroText}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link href="/rezervace" className="btn btn-primary">
                 Rezervovat konzultaci zdarma
@@ -62,9 +61,8 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <SpeedMeter medallion={<GuillocheMedallion id="uvod" className="h-full w-full" />} />
+          <SpeedMeter />
         </div>
-        <GuillocheBand id="uvod-pas" className="block" />
       </section>
 
       {/* Pro koho */}
@@ -73,16 +71,19 @@ export default async function HomePage() {
           <ul className="border-t border-line">
             {services.map((s) => (
               <li key={s.id} className="group relative border-b border-line">
-                <div className="grid gap-2 py-7 md:grid-cols-[1fr_1.3fr] md:items-baseline md:gap-12">
-                  <h3 className="text-[1.5rem] sm:text-[1.75rem]">
+                <div className="grid gap-2 py-7 md:grid-cols-[1fr_1.2fr_auto] md:items-baseline md:gap-10">
+                  <h3 className="text-[1.75rem] sm:text-[2rem]">
                     <Link
                       href={`/sluzby/${s.slug}`}
-                      className="no-underline after:absolute after:inset-0 group-hover:text-accent"
+                      className="no-underline after:absolute after:inset-0 group-hover:underline group-hover:decoration-tape group-hover:decoration-[3px]"
                     >
                       {s.title}
                     </Link>
                   </h3>
                   <p className="text-pencil">{s.shortDescription}</p>
+                  <span aria-hidden="true" className="ui hidden text-2xl transition-transform group-hover:translate-x-1 md:block">
+                    ⟶
+                  </span>
                 </div>
               </li>
             ))}
@@ -106,7 +107,7 @@ export default async function HomePage() {
           <ol className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
             {home.process.map((step, i) => (
               <li key={step.id ?? i} className="flex flex-col bg-paper p-6">
-                <span className="font-display text-[2rem] font-extrabold leading-none text-accent">
+                <span className="ui text-[2.5rem] font-bold leading-none text-tape [-webkit-text-stroke:1px_var(--color-ink)]">
                   {i + 1}
                 </span>
                 <h3 className="mt-5">{step.title}</h3>

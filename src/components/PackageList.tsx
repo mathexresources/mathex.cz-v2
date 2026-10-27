@@ -15,7 +15,7 @@ export function PackageList({ packages }: { packages: Package[] }) {
           }`}
         >
           {p.highlighted && (
-            <p className="ui absolute -top-3 left-0 bg-accent px-2 py-0.5 text-[0.85rem] font-semibold text-on-accent md:left-7">
+            <p className="ui absolute -top-3 left-0 bg-tape px-2 py-0.5 text-[0.85rem] font-semibold text-on-tape md:left-7">
               Nejčastější volba
             </p>
           )}
@@ -24,7 +24,7 @@ export function PackageList({ packages }: { packages: Package[] }) {
 
           <p className="ui mt-6">
             {p.priceFrom && <span className="text-pencil">od </span>}
-            <span className="font-display text-[2rem] font-extrabold tabular-nums">{formatPrice(p.price)}</span>
+            <span className="text-[2.25rem] font-bold tracking-[-0.03em] tabular-nums">{formatPrice(p.price)}</span>
           </p>
           <p className="ui mt-1 text-[0.9rem] text-pencil">
             {p.deliveryDays ? `Hotovo do ${p.deliveryDays} ${pluralDays(p.deliveryDays)} od dodání podkladů. ` : ''}

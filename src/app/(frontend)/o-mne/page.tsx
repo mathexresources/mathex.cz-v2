@@ -35,7 +35,7 @@ export default async function AboutPage() {
               className="aspect-[4/5] h-auto w-full border border-line object-cover"
             />
           ) : (
-            <div className="hatch aspect-[4/5] border border-line" role="img" aria-label="Místo pro fotku" />
+            <div className="blueprint-grid aspect-[4/5] border border-line" role="img" aria-label="Místo pro fotku" />
           )}
           <p className="ui mt-4 text-[1.2rem] font-bold">{site.ownerName}</p>
           {about.facts && about.facts.length > 0 && (

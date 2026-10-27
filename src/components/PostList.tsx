@@ -26,7 +26,7 @@ export function PostList({ posts }: { posts: Post[] }) {
               <h3 className="text-[1.5rem] leading-tight">
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="no-underline after:absolute after:inset-0 hover:underline hover:decoration-accent hover:decoration-2"
+                  className="no-underline after:absolute after:inset-0 hover:underline hover:decoration-tape hover:decoration-2"
                 >
                   {post.title}
                 </Link>

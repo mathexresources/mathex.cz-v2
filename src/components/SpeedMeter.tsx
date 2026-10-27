@@ -9,6 +9,8 @@ type Metrics = {
   requests: number
 }
 
+const SCALE_MAX = 4000 // ms – konec měřítka
+const GOOD_LCP = 2500 // ms – hranice „dobré“ podle Core Web Vitals
 
 const seconds = new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const kb = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 })
@@ -25,7 +27,7 @@ function measure(lcp: number | null): Metrics | null {
  * Živé měření rychlosti právě načtené stránky přímo v prohlížeči návštěvníka.
  * Důkaz místo tvrzení: nic se nepředstírá, čísla jsou z Performance API.
  */
-export function SpeedMeter({ medallion }: { medallion: React.ReactNode }) {
+export function SpeedMeter() {
   const [m, setM] = useState<Metrics | null>(null)
 
   useEffect(() => {
@@ -56,29 +58,54 @@ export function SpeedMeter({ medallion }: { medallion: React.ReactNode }) {
     }
   }, [])
 
-  const main = m ? (m.lcp ?? m.load) : null
+  const markerMs = m ? (m.lcp ?? m.load) : null
+  const markerPos = markerMs != null ? Math.min(100, (markerMs / SCALE_MAX) * 100) : null
+  const goodPos = (GOOD_LCP / SCALE_MAX) * 100
 
   return (
-    <figure className="relative mx-auto w-full max-w-[27rem] [container-type:inline-size]" aria-labelledby="speed-caption">
-      <div className="relative aspect-square">
-        <div className="absolute inset-0">{medallion}</div>
-        <div className="absolute inset-0 grid place-content-center justify-items-center text-center">
-          <figcaption id="speed-caption" className="max-w-[34cqi] text-[clamp(0.72rem,3.1cqi,0.875rem)] leading-snug text-pencil">
-            Tahle stránka se vám zobrazila za
-          </figcaption>
-          <p className="my-[1.2cqi] font-display text-[8.6cqi] font-extrabold leading-none" aria-live="polite">
-            {main != null ? `${seconds.format(main / 1000)} s` : <span className="text-line">–,– s</span>}
-          </p>
-          <p className="max-w-[34cqi] text-[clamp(0.72rem,3.1cqi,0.875rem)] leading-snug text-pencil">změřeno teď ve vašem prohlížeči</p>
+    <figure
+      className="ui relative border border-ink bg-surface p-5 sm:p-6"
+      aria-labelledby="speed-caption"
+    >
+      <figcaption id="speed-caption" className="text-[0.95rem] text-pencil">
+        Tahle stránka, změřeno teď ve vašem prohlížeči
+      </figcaption>
+
+      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4" aria-live="polite">
+        <Metric
+          label="Načtení stránky"
+          value={m ? `${seconds.format(m.load / 1000)} s` : null}
+        />
+        <Metric
+          label="Hlavní obsah vidět za"
+          value={m?.lcp != null ? `${seconds.format(m.lcp / 1000)} s` : m ? 'neměřitelné' : null}
+        />
+        <Metric label="Velikost" value={m ? `${kb.format(Math.max(1, m.bytes / 1024))} kB` : null} />
+        <Metric label="Počet souborů" value={m ? String(m.requests) : null} />
+      </dl>
+
+      {/* Kótovací čára: kde je tahle stránka vůči hranici, kterou Google považuje za dobrou */}
+      <div className="mt-6" aria-hidden="true">
+        <div className="relative h-8">
+          <div className="absolute inset-x-0 top-4 h-px bg-ink" />
+          <div className="absolute left-0 top-2 h-4 w-px bg-ink" />
+          <div className="absolute right-0 top-2 h-4 w-px bg-ink" />
+          <div className="absolute top-1 h-6 w-px bg-pencil" style={{ left: `${goodPos}%` }} />
+          {markerPos != null && (
+            <div
+              className="absolute top-0 h-8 w-2 -translate-x-1/2 bg-tape transition-[left] duration-700 ease-out"
+              style={{ left: `${markerPos}%` }}
+            />
+          )}
+        </div>
+        <div className="relative mt-1 h-5 text-[0.8rem] text-pencil">
+          <span className="absolute left-0">0 s</span>
+          <span className="absolute -translate-x-1/2 whitespace-nowrap" style={{ left: `${goodPos}%` }}>
+            limit Googlu 2,5 s
+          </span>
+          <span className="absolute right-0">4 s</span>
         </div>
       </div>
-
-      <dl className="mt-3 grid grid-cols-3 gap-4 border-t border-line pt-4 text-center">
-        <Metric label="Celé načtení" value={m ? `${seconds.format(m.load / 1000)} s` : null} />
-        <Metric label="Velikost" value={m ? `${kb.format(Math.max(1, m.bytes / 1024))} kB` : null} />
-        <Metric label="Souborů" value={m ? String(m.requests) : null} />
-      </dl>
-      <p className="mt-3 text-center text-[0.85rem] text-pencil">Google považuje za rychlé do 2,5 s.</p>
     </figure>
   )
 }
@@ -86,8 +113,10 @@ export function SpeedMeter({ medallion }: { medallion: React.ReactNode }) {
 function Metric({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <dt className="text-[0.8rem] text-pencil">{label}</dt>
-      <dd className="mt-0.5 text-[1.125rem] font-bold leading-tight">{value ?? <span className="text-line">–</span>}</dd>
+      <dt className="text-[0.85rem] text-pencil">{label}</dt>
+      <dd className="mt-0.5 text-[1.75rem] font-bold leading-none tracking-[-0.03em] tabular-nums">
+        {value ?? <span className="text-line">měřím…</span>}
+      </dd>
     </div>
   )
 }

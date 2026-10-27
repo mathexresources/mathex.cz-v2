@@ -12,7 +12,7 @@ export function CancelForm({ token }: { token: string }) {
 
   if (state.status === 'success') {
     return (
-      <div role="status" className="border-l-4 border-accent bg-surface p-6">
+      <div role="status" className="border-l-4 border-tape bg-surface p-6">
         <p className="ui text-[1.25rem] font-bold">{state.message}</p>
         <Link href="/rezervace" className="btn btn-primary mt-5">
           Vybrat nový termín

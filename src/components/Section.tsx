@@ -23,7 +23,7 @@ export function Section({
           {intro && <p className="mt-4 max-w-[58ch] text-pencil">{intro}</p>}
         </div>
         {link && (
-          <Link href={link.href} className="ui flex-none text-[1rem] font-semibold decoration-accent decoration-2">
+          <Link href={link.href} className="ui flex-none text-[1rem] font-semibold decoration-tape decoration-2">
             {link.label}
           </Link>
         )}
