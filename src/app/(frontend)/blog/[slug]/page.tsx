@@ -41,6 +41,7 @@ export default async function PostPage({ params }: Props) {
   const author = post.author && typeof post.author === 'object' ? (post.author as User) : null
   const service =
     post.relatedService && typeof post.relatedService === 'object' ? (post.relatedService as Service) : null
+  const isSecurity = category?.slug === 'bezpecnost' || service?.segment === 'bezpecnost'
   const [related, site] = await Promise.all([
     getPosts({ limit: 3, categoryId: category?.id, exclude: post.id }),
     getSiteSettings(),
@@ -99,24 +100,41 @@ export default async function PostPage({ params }: Props) {
           </p>
         </aside>
 
-        <div className="mt-12 max-w-[68ch] bg-ink p-6 text-paper sm:p-8">
-          <p className="ui text-[1.35rem] font-bold">
-            {service ? `Potřebujete ${service.title.toLowerCase()}?` : 'Chcete web, který přivádí zákazníky?'}
-          </p>
-          <p className="mt-2 opacity-85">
-            Na 30minutové konzultaci zdarma zjistíme, co váš web potřebuje a kolik to bude stát.
-          </p>
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Link href="/rezervace" className="btn border-tape bg-tape text-on-tape hover:bg-paper hover:text-ink">
-              Vybrat termín
-            </Link>
-            {service && (
-              <Link href={`/sluzby/${service.slug}`} className="btn border-paper text-paper hover:bg-paper hover:text-ink">
-                {service.title}
+        {isSecurity ? (
+          <div className="mt-12 max-w-[68ch] rounded-[3px] bg-ink p-6 text-paper sm:p-8">
+            <p className="text-[1.35rem] font-bold">Chcete to probrat s vašimi lidmi?</p>
+            <p className="mt-2 opacity-85">
+              Na přednášce ukážu phishing a OSINT na skutečných příkladech – pro firmu, školu i veřejnost.
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Link href="/kontakt?tema=prednaska" className="btn border-paper bg-paper text-ink hover:border-accent hover:bg-accent hover:text-on-accent">
+                Domluvit přednášku
               </Link>
-            )}
+              <Link href="/sluzby/prednasky-bezpecnost-na-internetu" className="btn border-paper text-paper hover:bg-paper hover:text-ink">
+                O přednáškách
+              </Link>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-12 max-w-[68ch] rounded-[3px] bg-ink p-6 text-paper sm:p-8">
+            <p className="text-[1.35rem] font-bold">
+              {service ? `Potřebujete ${service.title.toLowerCase()}?` : 'Chcete web, který přivádí zákazníky?'}
+            </p>
+            <p className="mt-2 opacity-85">
+              Na 30minutové konzultaci zdarma zjistíme, co váš web potřebuje a kolik to bude stát.
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Link href="/rezervace" className="btn border-paper bg-paper text-ink hover:border-accent hover:bg-accent hover:text-on-accent">
+                Vybrat termín
+              </Link>
+              {service && (
+                <Link href={`/sluzby/${service.slug}`} className="btn border-paper text-paper hover:bg-paper hover:text-ink">
+                  {service.title}
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {related.docs.length > 0 && (

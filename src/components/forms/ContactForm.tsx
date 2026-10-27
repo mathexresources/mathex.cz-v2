@@ -64,7 +64,7 @@ export function ContactForm({
 
   if (state.status === 'success') {
     return (
-      <div role="status" className="border-l-4 border-tape bg-paper p-6">
+      <div role="status" className="border-l-4 border-accent bg-paper p-6">
         <p className="ui text-[1.35rem] font-bold">Zpráva odeslaná</p>
         <p className="mt-2 text-pencil">{state.message}</p>
       </div>
@@ -75,11 +75,11 @@ export function ContactForm({
     <form action={action} className="relative min-w-0 space-y-6" noValidate>
       <fieldset className="min-w-0">
         <legend className="field-label">S čím se ozýváte</legend>
-        <div className="ui grid grid-cols-3 gap-1 rounded-lg border border-line bg-paper p-1">
+        <div className="ui grid grid-cols-3 gap-1 rounded-[3px] border border-line bg-paper p-1">
           {(Object.keys(TOPICS) as ContactTopic[]).map((key) => (
             <label
               key={key}
-              className="relative flex min-h-11 min-w-0 cursor-pointer items-center justify-center rounded-md px-2 text-center text-[0.95rem] font-semibold leading-tight text-pencil transition-colors hover:text-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-tape"
+              className="relative flex min-h-11 min-w-0 cursor-pointer items-center justify-center rounded-[3px] px-2 text-center text-[0.95rem] font-semibold leading-tight text-pencil transition-colors hover:text-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent"
             >
               <input
                 type="radio"

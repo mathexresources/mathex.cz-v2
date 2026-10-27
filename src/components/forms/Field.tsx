@@ -64,7 +64,7 @@ export function Consent({ error, privacyHref }: { error?: string; privacyHref: s
         />
         <span>
           Souhlasím se zpracováním osobních údajů za účelem odpovědi na můj dotaz.{' '}
-          <a href={privacyHref} target="_blank" rel="noopener" className="underline decoration-tape decoration-2">
+          <a href={privacyHref} target="_blank" rel="noopener" className="underline decoration-accent decoration-2">
             Jak s údaji zacházím
           </a>
         </span>

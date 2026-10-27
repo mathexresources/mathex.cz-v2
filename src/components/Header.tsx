@@ -13,8 +13,8 @@ export function Header({ brand }: { brand: string }) {
 
         <nav aria-label="Hlavní navigace" className="hidden lg:block">
           <NavLinks
-            className="ui flex items-center gap-7 text-[0.975rem]"
-            linkClassName="no-underline text-pencil hover:text-ink aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-tape aria-[current=page]:decoration-2"
+            className="flex items-center gap-7 text-[1rem]"
+            linkClassName="no-underline text-pencil hover:text-ink aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-accent aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-[0.4em]"
           />
         </nav>
 
@@ -25,13 +25,13 @@ export function Header({ brand }: { brand: string }) {
 
           {/* Mobilní menu bez JavaScriptu */}
           <details className="group relative lg:hidden">
-            <summary className="ui flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-line px-3 text-[0.95rem] font-semibold [&::-webkit-details-marker]:hidden">
+            <summary className="ui flex h-10 cursor-pointer list-none items-center gap-2 rounded-[3px] border-2 border-ink px-3 text-[0.95rem] font-semibold [&::-webkit-details-marker]:hidden">
               <span className="group-open:hidden">Menu</span>
               <span className="hidden group-open:inline">Zavřít</span>
             </summary>
             <nav
               aria-label="Mobilní navigace"
-              className="absolute right-0 top-12 w-64 border border-line bg-surface p-2 shadow-[0_12px_32px_-12px_rgb(23_36_64/0.35)]"
+              className="absolute right-0 top-12 w-64 border border-line bg-surface p-2 "
             >
               <NavLinks
                 className="ui flex flex-col text-lg"

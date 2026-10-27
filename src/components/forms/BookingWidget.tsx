@@ -127,7 +127,7 @@ export function BookingWidget({
         {days === null || (loading && !days.length) ? (
           <p className="ui mt-4 text-pencil">Načítám volné termíny…</p>
         ) : days.length === 0 ? (
-          <p className="ui mt-4 border-l-4 border-tape bg-surface p-4">
+          <p className="ui mt-4 border-l-4 border-accent bg-surface p-4">
             V nejbližších dnech nemám volno. Napište mi prosím přes{' '}
             <Link href="/kontakt">kontaktní formulář</Link> a domluvíme se jinak.
           </p>
@@ -143,7 +143,7 @@ export function BookingWidget({
                     setDay(d.date)
                     setSlot(null)
                   }}
-                  className="ui flex min-w-[5.5rem] flex-col items-center rounded-md border border-line bg-surface px-3 py-2.5 text-[0.95rem] hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+                  className="ui flex min-w-[5.5rem] flex-none flex-col items-center whitespace-nowrap rounded-[3px] border border-line bg-surface px-3 py-2.5 text-[0.95rem] hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
                 >
                   <span className="capitalize">{dayFmt.format(keyToDate(d.date))}</span>
                   <span className="text-[0.8rem] opacity-75">{d.slots.length} volných</span>
@@ -158,7 +158,7 @@ export function BookingWidget({
                   {currentDay.slots.map((s) => (
                     <label
                       key={s}
-                      className="ui flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-line bg-surface text-[1rem] tabular-nums hover:border-ink has-[:checked]:border-tape has-[:checked]:bg-tape has-[:checked]:font-bold has-[:checked]:text-on-tape has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink"
+                      className="ui flex min-h-11 cursor-pointer items-center justify-center rounded-[3px] border border-line bg-surface text-[1rem] tabular-nums hover:border-ink has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:font-bold has-[:checked]:text-on-accent has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink"
                     >
                       <input
                         type="radio"

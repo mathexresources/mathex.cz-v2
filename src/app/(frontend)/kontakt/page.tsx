@@ -37,7 +37,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
       />
 
       <div className="container-site mt-12 grid gap-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-16">
-        <div className="min-w-0 rounded-lg border border-line bg-surface p-5 sm:p-8">
+        <div className="min-w-0 rounded-[3px] border border-line bg-surface p-5 sm:p-8">
           <ContactForm
             privacyHref="/ochrana-osobnich-udaju"
             source={topic ? `/kontakt?tema=${topic}` : '/kontakt'}
@@ -55,12 +55,9 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
                   <a href={d.href} data-umami-event={d.event} className="group flex items-center justify-between gap-4 py-4 no-underline">
                     <span className="min-w-0">
                       <span className="block text-[0.85rem] text-pencil">{d.label}</span>
-                      <span className="block text-[1.1rem] font-semibold [overflow-wrap:anywhere] group-hover:underline group-hover:decoration-tape group-hover:decoration-2">
+                      <span className="block text-[1.1rem] font-semibold [overflow-wrap:anywhere] group-hover:text-accent">
                         {d.value}
                       </span>
-                    </span>
-                    <span aria-hidden="true" className="flex-none text-pencil transition-transform group-hover:translate-x-0.5">
-                      →
                     </span>
                   </a>
                 </li>
@@ -68,7 +65,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
             </ul>
           </section>
 
-          <section className="border-l-4 border-tape bg-surface p-5">
+          <section className="border-l-4 border-accent bg-surface p-5">
             <h2 className="text-[1.05rem] font-bold">Radši si zavoláme?</h2>
             <p className="mt-1.5 text-[0.95rem] text-pencil">
               Konzultace na 30 minut zdarma. Vyberte si termín, který vám sedí.
@@ -79,7 +76,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
           </section>
 
           <section className="text-[0.9rem] text-pencil">
-            <h2 className="text-[0.85rem] font-semibold uppercase tracking-wide">Fakturační údaje</h2>
+            <h2 className="text-[1.05rem] font-bold">Fakturační údaje</h2>
             <p className="mt-2 font-semibold text-ink">{site.ownerName}</p>
             <p>IČO {site.ico}</p>
             {site.vatPayer && site.dic ? <p>DIČ {site.dic}</p> : <p>Neplátce DPH</p>}

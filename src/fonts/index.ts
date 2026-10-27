@@ -1,23 +1,25 @@
 import localFont from 'next/font/local'
 
+/** Archivo Expanded – nadpisy (široký řez jako na dokladech a bankovkách). */
 export const displayFont = localFont({
-  src: './bricolage-grotesque.woff2',
-  weight: '400 800',
+  src: './archivo-expanded.woff2',
+  weight: '600 800',
   style: 'normal',
   // Nadpisy jsou hlavní obsah (LCP): když písmo nedorazí do ~100 ms, zůstane
   // při první návštěvě upravený záložní font a nadpis se už nepřekresluje.
   display: 'optional',
-  variable: '--font-bricolage',
-  fallback: ['ui-sans-serif', 'system-ui', 'Arial', 'sans-serif'],
+  variable: '--font-archivo',
+  fallback: ['Arial Black', 'Arial', 'sans-serif'],
   adjustFontFallback: 'Arial',
 })
 
-export const serifFont = localFont({
-  src: './source-serif-4.woff2',
-  weight: '400 700',
+/** Atkinson Hyperlegible Next – text a ovládací prvky (navrženo pro maximální čitelnost). */
+export const textFont = localFont({
+  src: './atkinson-hyperlegible-next.woff2',
+  weight: '200 800',
   style: 'normal',
   display: 'swap',
-  variable: '--font-source-serif',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
-  adjustFontFallback: 'Times New Roman',
+  variable: '--font-atkinson',
+  fallback: ['ui-sans-serif', 'system-ui', 'Arial', 'sans-serif'],
+  adjustFontFallback: 'Arial',
 })

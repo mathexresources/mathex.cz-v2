@@ -66,13 +66,13 @@ export function Footer({ site, services, pages }: Props) {
       </div>
 
       <div className="container-site mt-14 flex flex-col gap-4 border-t border-line pt-6 text-[0.875rem] text-pencil md:flex-row md:justify-between">
-        <p className="ui">
-          © {year} {site.ownerName} · IČO {site.ico}
-          {site.vatPayer && site.dic ? ` · DIČ ${site.dic}` : ' · Neplátce DPH'}
-          {address ? ` · ${address}` : ''}
-          <br />
-          {site.registry}
-        </p>
+        <div>
+          <p>
+            © {year} {site.ownerName}, IČO {site.ico}, {site.vatPayer && site.dic ? `DIČ ${site.dic}` : 'neplátce DPH'}
+          </p>
+          {address && <p>{address}</p>}
+          <p>{site.registry}</p>
+        </div>
         <ul className="ui flex flex-wrap gap-x-5 gap-y-1">
           {pages
             .filter((p) => p.showInFooter !== false)
@@ -90,7 +90,7 @@ export function Footer({ site, services, pages }: Props) {
 function FooterList({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="ui text-[0.95rem] font-semibold tracking-normal text-ink">{title}</h2>
+      <h2 className="text-[0.95rem] font-bold tracking-normal text-ink">{title}</h2>
       <ul className="ui mt-3 space-y-2 text-[0.95rem] text-pencil [&_a]:no-underline [&_a:hover]:text-ink [&_a:hover]:underline">
         {children}
       </ul>

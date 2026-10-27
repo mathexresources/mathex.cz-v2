@@ -29,7 +29,7 @@ export default async function ServicesPage() {
               <h2 className="text-[2rem]">
                 <Link
                   href={`/sluzby/${s.slug}`}
-                  className="no-underline after:absolute after:inset-0 group-hover:underline group-hover:decoration-tape group-hover:decoration-[3px]"
+                  className="no-underline after:absolute after:inset-0 group-hover:underline group-hover:decoration-accent group-hover:decoration-[3px]"
                 >
                   {s.title}
                 </Link>
