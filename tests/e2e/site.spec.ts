@@ -117,6 +117,13 @@ test('mobil: lepicí lišta se Zavolat a Rezervovat', async ({ browser }) => {
     await page.goto(path)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), path).toBe(true)
   }
+  // rezervace: pás dnů se načítá až v prohlížeči – počkat na něj
+  for (const width of [320, 1280]) {
+    await page.setViewportSize({ width, height: 800 })
+    await page.goto('/rezervace')
+    await expect(page.getByRole('button', { name: /volných|volné|volný/ }).first()).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `/rezervace ${width}px`).toBe(true)
+  }
   await page.close()
 })
 

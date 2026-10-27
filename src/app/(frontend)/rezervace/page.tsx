@@ -32,8 +32,8 @@ export default async function BookingPage({ searchParams }: Props) {
         intro="Konzultace je zdarma a k ničemu vás nezavazuje. Probereme váš web nebo přednášku, co od toho čekáte a kolik to bude stát."
         crumbs={[{ name: 'Rezervace', path: '/rezervace' }]}
       />
-      <div className="container-site mt-14 grid gap-16 lg:grid-cols-[1fr_18rem]">
-        <div className="max-w-3xl">
+      <div className="container-site mt-14 grid gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="min-w-0 max-w-3xl">
           {settings.enabled && types.length ? (
             <BookingWidget
               types={types}

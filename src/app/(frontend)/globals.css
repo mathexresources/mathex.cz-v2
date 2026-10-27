@@ -110,6 +110,14 @@
   }
 }
 
+/* <fieldset> má v prohlížečích min-width podle obsahu – posuvný pás (např. dny v rezervaci)
+   by jinak roztáhl celou stránku do šířky */
+@layer base {
+  fieldset {
+    min-width: 0;
+  }
+}
+
 @layer components {
   .container-site {
     width: 100%;

@@ -90,7 +90,7 @@ export function BookingWidget({
   const currentDay = days?.find((d) => d.date === day)
 
   return (
-    <form action={action} className="relative space-y-12" noValidate>
+    <form action={action} className="relative min-w-0 space-y-12" noValidate>
       {/* 1. Typ schůzky */}
       <fieldset>
         <legend className="ui text-[1.35rem] font-bold">Jak se chcete potkat</legend>
