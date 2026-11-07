@@ -9,11 +9,7 @@ type Metrics = {
   requests: number
 }
 
-const SCALE_MAX = 4000 // ms – konec měřítka
-const GOOD_LCP = 2500 // ms – hranice „dobré“ podle Core Web Vitals
-
 const seconds = new Intl.NumberFormat('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const kb = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 })
 
 function measure(lcp: number | null): Metrics | null {
   const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
@@ -58,65 +54,15 @@ export function SpeedMeter() {
     }
   }, [])
 
-  const markerMs = m ? (m.lcp ?? m.load) : null
-  const markerPos = markerMs != null ? Math.min(100, (markerMs / SCALE_MAX) * 100) : null
-  const goodPos = (GOOD_LCP / SCALE_MAX) * 100
+  const main = m ? (m.lcp ?? m.load) : null
 
   return (
-    <figure
-      className="ui relative border border-ink bg-surface p-5 sm:p-6"
-      aria-labelledby="speed-caption"
-    >
-      <figcaption id="speed-caption" className="text-[0.95rem] text-pencil">
-        Tahle stránka, změřeno teď ve vašem prohlížeči
-      </figcaption>
-
-      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4" aria-live="polite">
-        <Metric
-          label="Načtení stránky"
-          value={m ? `${seconds.format(m.load / 1000)} s` : null}
-        />
-        <Metric
-          label="Hlavní obsah vidět za"
-          value={m?.lcp != null ? `${seconds.format(m.lcp / 1000)} s` : m ? 'neměřitelné' : null}
-        />
-        <Metric label="Velikost" value={m ? `${kb.format(Math.max(1, m.bytes / 1024))} kB` : null} />
-        <Metric label="Počet souborů" value={m ? String(m.requests) : null} />
-      </dl>
-
-      {/* Kótovací čára: kde je tahle stránka vůči hranici, kterou Google považuje za dobrou */}
-      <div className="mt-6" aria-hidden="true">
-        <div className="relative h-8">
-          <div className="absolute inset-x-0 top-4 h-px bg-ink" />
-          <div className="absolute left-0 top-2 h-4 w-px bg-ink" />
-          <div className="absolute right-0 top-2 h-4 w-px bg-ink" />
-          <div className="absolute top-1 h-6 w-px bg-pencil" style={{ left: `${goodPos}%` }} />
-          {markerPos != null && (
-            <div
-              className="absolute top-0 h-8 w-2 -translate-x-1/2 bg-tape transition-[left] duration-700 ease-out"
-              style={{ left: `${markerPos}%` }}
-            />
-          )}
-        </div>
-        <div className="relative mt-1 h-5 text-[0.8rem] text-pencil">
-          <span className="absolute left-0">0 s</span>
-          <span className="absolute -translate-x-1/2 whitespace-nowrap" style={{ left: `${goodPos}%` }}>
-            limit Googlu 2,5 s
-          </span>
-          <span className="absolute right-0">4 s</span>
-        </div>
-      </div>
-    </figure>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: string | null }) {
-  return (
-    <div>
-      <dt className="text-[0.85rem] text-pencil">{label}</dt>
-      <dd className="mt-0.5 text-[1.75rem] font-bold leading-none tracking-[-0.03em] tabular-nums">
-        {value ?? <span className="text-line">měřím…</span>}
-      </dd>
-    </div>
+    <p className="ui mt-6 text-[1rem] text-pencil" aria-live="polite">
+      Tahle stránka se vám načetla za{' '}
+      <strong className="whitespace-nowrap font-display text-[1.375rem] font-black text-tape">
+        {main != null ? `${seconds.format(main / 1000)} s` : '–,– s'}
+      </strong>
+      . Změřeno teď ve vašem prohlížeči, Google považuje za rychlé do 2,5&nbsp;s.
+    </p>
   )
 }

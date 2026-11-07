@@ -17,10 +17,10 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
   const H = headingLevel === 2 ? 'h2' : 'h3'
 
   return (
-    <ul className="divide-y divide-line border-y border-line">
+    <ul className="divide-y divide-ink border-y border-ink">
       {projects.map((p, i) => (
         <li key={p.id} className="group relative grid gap-6 py-8 md:grid-cols-[1.35fr_1fr] md:gap-10 md:py-10">
-          <div className={`overflow-hidden border border-line bg-surface ${i % 2 ? 'md:order-2' : ''}`}>
+          <div className={`overflow-hidden bg-surface ${i % 2 ? 'md:order-2' : ''}`}>
             {p.cover && typeof p.cover === 'object' ? (
               <CmsImage
                 media={p.cover}
@@ -37,11 +37,11 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
               {p.client}
               {p.segment ? `, ${segmentLabel(p.segment).toLowerCase()}` : ''}
               {p.isDemo && (
-                <span className="ml-2 rounded-sm border border-pencil px-1.5 py-0.5 text-[0.8rem]">ukázka</span>
+                <span className="ml-2 border border-pencil px-1.5 py-0.5 text-[0.8rem]">ukázka</span>
               )}
             </p>
-            <H className="mt-2 text-[1.75rem] leading-tight">
-              <Link href={`/portfolio/${p.slug}`} className="no-underline after:absolute after:inset-0 hover:underline hover:decoration-tape hover:decoration-2">
+            <H className="mt-2 text-[clamp(1.75rem,1.2rem+1.6vw,2.5rem)] font-black leading-[0.98] tracking-[-0.03em] transition-colors group-hover:text-tape">
+              <Link href={`/portfolio/${p.slug}`} className="no-underline after:absolute after:inset-0">
                 {p.title}
               </Link>
             </H>
@@ -52,7 +52,7 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
                 {p.deliveredInDays ? (
                   <div>
                     <dt className="text-[0.85rem] text-pencil">Hotovo za</dt>
-                    <dd className="text-2xl font-bold tabular-nums">
+                    <dd className="font-display text-2xl font-black tabular-nums">
                       {p.deliveredInDays} {pluralDays(p.deliveredInDays)}
                     </dd>
                   </div>
@@ -60,7 +60,7 @@ export function ProjectList({ projects, headingLevel = 3 }: { projects: Project[
                 {p.pagespeedMobile ? (
                   <div>
                     <dt className="text-[0.85rem] text-pencil">PageSpeed mobil</dt>
-                    <dd className="text-2xl font-bold tabular-nums">{p.pagespeedMobile}/100</dd>
+                    <dd className="font-display text-2xl font-black tabular-nums">{p.pagespeedMobile}/100</dd>
                   </div>
                 ) : null}
               </dl>

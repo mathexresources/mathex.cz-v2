@@ -30,7 +30,9 @@ test('termíny obsazené v Google Kalendáři se nenabízí', async ({ page }) =
   const labels = await dayButtons(page).allTextContents()
   expect(labels.length).toBeGreaterThan(3)
   // Tlačítka dnů mají text např. „po 26. 10.16 volných“ – obsazený den mezi nimi být nesmí
-  expect(labels.some((l) => l.includes(`${day}. ${month}.`))).toBe(false)
+  // celé datum – „7. 11.“ nesmí chytit „17. 11.“
+  const date = new RegExp(`(^|\\D)${day}\\. ${month}\\.`)
+  expect(labels.some((l) => date.test(l))).toBe(false)
 })
 
 test('rezervace → potvrzení s pozvánkou → zrušení odkazem → e-mail o zrušení', async ({ page }) => {

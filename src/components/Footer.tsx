@@ -15,7 +15,7 @@ export function Footer({ site, services, pages }: Props) {
   const address = [site.street, [site.zip, site.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')
 
   return (
-    <footer className="mt-24 border-t border-line pb-24 pt-14 sm:pb-12">
+    <footer className="mt-24 border-t-[3px] border-ink pb-24 pt-14 sm:pb-12">
       <div className="container-site grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="max-w-sm">
           <Wordmark name={site.brandName} />

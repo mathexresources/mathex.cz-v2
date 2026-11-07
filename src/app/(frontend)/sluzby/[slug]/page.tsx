@@ -139,7 +139,15 @@ export default async function ServicePage({ params }: Props) {
       )}
 
       <JsonLd data={serviceSchema(service, packages)} />
-      <ClosingCta phone={site.phone} />
+      {isLecture ? (
+        <ClosingCta
+          title="Domluvíme přednášku?"
+          text="Napište mi, pro koho by byla, kolik lidí a kde. Pošlu nabídku a návrh témat. Nebo si rovnou vyberte termín krátkého hovoru."
+          phone={site.phone}
+        />
+      ) : (
+        <ClosingCta phone={site.phone} />
+      )}
     </>
   )
 }

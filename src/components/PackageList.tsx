@@ -6,7 +6,7 @@ import type { Package } from '@/payload-types'
 export function PackageList({ packages }: { packages: Package[] }) {
   if (!packages.length) return null
   return (
-    <div className="grid border-y border-line md:grid-cols-3 md:divide-x md:divide-line">
+    <div className="grid border-t-[3px] border-ink md:grid-cols-3 md:divide-x md:divide-ink">
       {packages.map((p) => (
         <article
           key={p.id}
@@ -19,12 +19,12 @@ export function PackageList({ packages }: { packages: Package[] }) {
               Nejčastější volba
             </p>
           )}
-          <h3 className="text-[1.5rem]">{p.name}</h3>
+          <h3 className="text-[1.75rem]">{p.name}</h3>
           <p className="mt-2 text-[1rem] text-pencil">{p.description}</p>
 
           <p className="ui mt-6">
             {p.priceFrom && <span className="text-pencil">od </span>}
-            <span className="text-[2.25rem] font-bold tracking-[-0.03em] tabular-nums">{formatPrice(p.price)}</span>
+            <span className="font-display text-[2.25rem] font-black tracking-[-0.03em] tabular-nums">{formatPrice(p.price)}</span>
           </p>
           <p className="ui mt-1 text-[0.9rem] text-pencil">
             {p.deliveryDays ? `Hotovo do ${p.deliveryDays} ${pluralDays(p.deliveryDays)} od dodání podkladů. ` : ''}

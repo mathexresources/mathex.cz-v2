@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { JsonLd } from '@/components/JsonLd'
 import { MobileCta } from '@/components/MobileCta'
-import { displayFont, serifFont } from '@/fonts'
+import { displayFont, textFont } from '@/fonts'
 import { getPages, getServices, getSiteSettings, getTestimonials } from '@/lib/data'
 import { businessSchema, personSchema, websiteSchema } from '@/lib/schema'
 import { SITE_URL } from '@/lib/seo'
@@ -44,10 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f6f7f4' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f1a2e' },
-  ],
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
 }
@@ -61,7 +58,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   ])
 
   return (
-    <html lang="cs" className={`${displayFont.variable} ${serifFont.variable}`}>
+    <html lang="cs" className={`${displayFont.variable} ${textFont.variable}`}>
       <body>
         <a
           href="#obsah"

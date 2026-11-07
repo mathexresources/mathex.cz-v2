@@ -37,7 +37,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
       />
 
       <div className="container-site mt-12 grid gap-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-16">
-        <div className="min-w-0 rounded-lg border border-line bg-surface p-5 sm:p-8">
+        <div className="min-w-0 border-2 border-ink p-5 sm:p-8">
           <ContactForm
             privacyHref="/ochrana-osobnich-udaju"
             source={topic ? `/kontakt?tema=${topic}` : '/kontakt'}
@@ -79,7 +79,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
           </section>
 
           <section className="text-[0.9rem] text-pencil">
-            <h2 className="text-[0.85rem] font-semibold uppercase tracking-wide">Fakturační údaje</h2>
+            <h2 className="text-[1.05rem] font-bold">Fakturační údaje</h2>
             <p className="mt-2 font-semibold text-ink">{site.ownerName}</p>
             <p>IČO {site.ico}</p>
             {site.vatPayer && site.dic ? <p>DIČ {site.dic}</p> : <p>Neplátce DPH</p>}

@@ -5,7 +5,7 @@ import type { Category } from '@/payload-types'
 export function CategoryNav({ categories, active }: { categories: Category[]; active?: string }) {
   if (!categories.length) return null
   const base =
-    'rounded-full border px-3.5 py-1.5 no-underline transition-colors hover:border-ink'
+    'border-2 px-3.5 py-1.5 no-underline transition-colors hover:border-ink'
   return (
     <nav aria-label="Kategorie článků" className="ui mt-8">
       <ul className="flex flex-wrap gap-2 text-[0.95rem]">

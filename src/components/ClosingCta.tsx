@@ -11,21 +11,21 @@ export function ClosingCta({
 }) {
   return (
     <section className="container-site mt-28" aria-labelledby="cta-title">
-      <div className="grid gap-8 border-t-4 border-tape bg-ink px-6 py-12 text-paper sm:px-10 md:grid-cols-[1.4fr_1fr] md:items-end md:py-16">
+      <div className="grid gap-8 bg-tape px-6 py-12 text-ink sm:px-10 md:grid-cols-[1.4fr_1fr] md:items-end md:py-16">
         <div>
-          <h2 id="cta-title" className="max-w-[18ch]">
+          <h2 id="cta-title" className="max-w-[16ch] text-[clamp(2.25rem,1.2rem+3.6vw,4.5rem)] leading-[0.95]">
             {title}
           </h2>
-          <p className="mt-4 max-w-[52ch] opacity-85">{text}</p>
+          <p className="mt-5 max-w-[52ch] text-[1.125rem]">{text}</p>
         </div>
         <div className="flex flex-col gap-3 md:items-end">
-          <Link href="/rezervace" className="btn w-full border-tape bg-tape text-on-tape hover:bg-paper hover:text-ink md:w-auto">
+          <Link href="/rezervace" className="btn w-full border-ink bg-ink text-paper hover:bg-paper hover:text-ink md:w-auto">
             Vybrat termín konzultace
           </Link>
           {phone && (
             <a
               href={`tel:${phone.replace(/\s/g, '')}`}
-              className="ui text-[1rem] text-paper/85 underline decoration-tape underline-offset-4 hover:text-paper"
+              className="ui text-[1rem] font-semibold underline decoration-2 underline-offset-4"
             >
               nebo zavolejte na {phone}
             </a>

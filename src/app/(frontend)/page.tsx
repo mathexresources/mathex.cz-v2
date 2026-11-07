@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { AccentText, plainText } from '@/components/AccentText'
 import { ClosingCta } from '@/components/ClosingCta'
 import { FaqList } from '@/components/FaqList'
 import { JsonLd } from '@/components/JsonLd'
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const [home, site] = await Promise.all([getHomePage(), getSiteSettings()])
   return buildMetadata({
     title: `${site.brandName} – ${site.tagline}`,
-    description: site.defaultDescription || home.heroText,
+    description: site.defaultDescription || plainText(home.heroText),
     path: '/',
     meta: home.meta,
     image: site.defaultOgImage,
@@ -47,43 +48,42 @@ export default async function HomePage() {
   return (
     <>
       {/* Úvod */}
-      <section className="blueprint-grid border-b border-line">
-        <div className="container-site grid gap-12 py-14 sm:py-20 lg:grid-cols-[1.35fr_1fr] lg:items-end lg:gap-16 lg:py-24">
+      <section className="container-site pt-12 sm:pt-16 lg:pt-20">
+        <h1 className="text-[clamp(2.75rem,1rem+8.4vw,8.25rem)] leading-[0.98] tracking-[-0.035em] sm:leading-[0.92]">
+          <AccentText text={home.heroTitle} />
+        </h1>
+        <div className="mt-10 grid gap-8 border-t-[3px] border-ink pt-8 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
           <div>
-            <h1 className="max-w-[17ch]">{home.heroTitle}</h1>
-            <p className="mt-6 max-w-[54ch] text-[1.2rem] text-pencil">{home.heroText}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/rezervace" className="btn btn-primary">
-                Rezervovat konzultaci zdarma
-              </Link>
-              <Link href="/sluzby/prednasky-bezpecnost-na-internetu" className="btn btn-secondary">
-                Přednášky o bezpečnosti
-              </Link>
-            </div>
+            <p className="max-w-[52ch] text-[1.25rem] leading-relaxed">{home.heroText}</p>
+            <SpeedMeter />
           </div>
-          <SpeedMeter />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:flex-nowrap lg:items-start lg:justify-end">
+            <Link href="/rezervace" className="btn btn-primary">
+              Rezervovat konzultaci zdarma
+            </Link>
+            <Link href="/sluzby/prednasky-bezpecnost-na-internetu" className="btn btn-secondary">
+              Přednášky o bezpečnosti
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Pro koho */}
       {services.length > 0 && (
         <Section id="sluzby" title="Co dělám">
-          <ul className="border-t border-line">
+          <ul>
             {services.map((s) => (
-              <li key={s.id} className="group relative border-b border-line">
-                <div className="grid gap-2 py-7 md:grid-cols-[1fr_1.2fr_auto] md:items-baseline md:gap-10">
-                  <h3 className="text-[1.75rem] sm:text-[2rem]">
+              <li key={s.id} className="group relative border-b border-ink">
+                <div className="grid gap-2 py-7 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-end md:gap-12">
+                  <h3 className="text-[clamp(1.875rem,1rem+3vw,3.25rem)] font-black leading-[0.95] tracking-[-0.03em] transition-colors group-hover:text-tape">
                     <Link
                       href={`/sluzby/${s.slug}`}
-                      className="no-underline after:absolute after:inset-0 group-hover:underline group-hover:decoration-tape group-hover:decoration-[3px]"
+                      className="no-underline after:absolute after:inset-0"
                     >
                       {s.title}
                     </Link>
                   </h3>
                   <p className="text-pencil">{s.shortDescription}</p>
-                  <span aria-hidden="true" className="ui hidden text-2xl transition-transform group-hover:translate-x-1 md:block">
-                    ⟶
-                  </span>
                 </div>
               </li>
             ))}
@@ -104,10 +104,10 @@ export default async function HomePage() {
       {/* Postup */}
       {home.process && home.process.length > 0 && (
         <Section id="postup" title="Jak vzniká web">
-          <ol className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {home.process.map((step, i) => (
-              <li key={step.id ?? i} className="flex flex-col bg-paper p-6">
-                <span className="ui text-[2.5rem] font-bold leading-none text-tape [-webkit-text-stroke:1px_var(--color-ink)]">
+              <li key={step.id ?? i} className="flex flex-col border-t-[3px] border-ink pt-5">
+                <span className="font-display text-[3.5rem] font-black leading-none text-tape">
                   {i + 1}
                 </span>
                 <h3 className="mt-5">{step.title}</h3>

@@ -15,7 +15,7 @@ export function Section({
 }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="container-site mt-24 sm:mt-28">
-      <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="mb-10 flex flex-col gap-4 border-t-[3px] border-ink pt-6 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 id={`${id}-title`} className="max-w-[22ch]">
             {title}
@@ -23,7 +23,7 @@ export function Section({
           {intro && <p className="mt-4 max-w-[58ch] text-pencil">{intro}</p>}
         </div>
         {link && (
-          <Link href={link.href} className="ui flex-none text-[1rem] font-semibold decoration-tape decoration-2">
+          <Link href={link.href} className="ui flex-none text-[1rem] font-bold underline decoration-2 underline-offset-4 hover:text-tape">
             {link.label}
           </Link>
         )}

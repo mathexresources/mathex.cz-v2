@@ -11,10 +11,17 @@ export const SITE = {
     'Navrhuji a programuji rychlé a bezpečné weby na míru a přednáším o bezpečnosti na internetu, phishingu a OSINT pro firmy, školy i veřejnost.',
 }
 
-export const HOME = {
+/** Texty úvodu z předchozí verze (2026-10) – mění se jen tam, kde zůstaly beze změny. */
+export const HOME_PREV = {
   heroTitle: 'Rychlé a bezpečné weby na míru. A přednášky o tom, jak se na internetu nenechat napálit.',
   heroText:
     'Navrhnu a naprogramuju web pro vaši firmu, projekt nebo organizaci – bez šablon, s pevnou cenou a hotový v řádu týdnů. Na přednáškách ukazuji firmám, školám i veřejnosti, jak fungují phishingové útoky, co o nich prozradí internet (OSINT) a jak se bránit.',
+}
+
+export const HOME = {
+  heroTitle: 'Weby, které *nezdržují.* A lidi, které nenapálí.',
+  heroText:
+    'Navrhnu a naprogramuju rychlý a bezpečný web na míru. Na přednáškách ukazuji, jak fungují phishingové útoky a co o vás prozradí internet.',
   closingTitle: 'Pojďme to probrat',
   closingText:
     'Úvodní konzultace trvá 30 minut a je zdarma. Ať jde o nový web, nebo přednášku pro vaše lidi, řeknu vám, co to obnáší, kolik to stojí a kdy to stihneme.',

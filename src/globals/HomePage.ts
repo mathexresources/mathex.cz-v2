@@ -15,7 +15,8 @@ export const HomePage: GlobalConfig = {
       label: 'Hlavní nadpis',
       type: 'textarea',
       required: true,
-      defaultValue: 'Rychlé a bezpečné weby na míru. A přednášky o tom, jak se na internetu nenechat napálit.',
+      defaultValue: 'Weby, které *nezdržují.* A lidi, které nenapálí.',
+      admin: { description: 'Text mezi hvězdičkami se zobrazí oranžově, např. Weby, které *nezdržují.*' },
     },
     {
       name: 'heroText',
@@ -23,7 +24,7 @@ export const HomePage: GlobalConfig = {
       type: 'textarea',
       required: true,
       defaultValue:
-        'Navrhnu a naprogramuju web pro vaši firmu, projekt nebo organizaci – bez šablon, s pevnou cenou a hotový v řádu týdnů.',
+        'Navrhnu a naprogramuju rychlý a bezpečný web na míru. Na přednáškách ukazuji, jak fungují phishingové útoky a co o vás prozradí internet.',
     },
     {
       name: 'process',
