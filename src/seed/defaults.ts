@@ -18,13 +18,22 @@ export const HOME_PREV = {
     'Navrhnu a naprogramuju web pro vaši firmu, projekt nebo organizaci – bez šablon, s pevnou cenou a hotový v řádu týdnů. Na přednáškách ukazuji firmám, školám i veřejnosti, jak fungují phishingové útoky, co o nich prozradí internet (OSINT) a jak se bránit.',
 }
 
-export const HOME = {
+/** Úvod z verze „plakát“ (2026-11-07), kdy byla úvodní stránka i o přednáškách. */
+export const HOME_POSTER = {
   heroTitle: 'Weby, které *nezdržují.* A lidi, které nenapálí.',
   heroText:
     'Navrhnu a naprogramuju rychlý a bezpečný web na míru. Na přednáškách ukazuji, jak fungují phishingové útoky a co o vás prozradí internet.',
-  closingTitle: 'Pojďme to probrat',
   closingText:
     'Úvodní konzultace trvá 30 minut a je zdarma. Ať jde o nový web, nebo přednášku pro vaše lidi, řeknu vám, co to obnáší, kolik to stojí a kdy to stihneme.',
+}
+
+export const HOME = {
+  heroTitle: 'Weby, které *nezdržují.*',
+  heroText:
+    'Navrhnu a naprogramuju rychlý a bezpečný web pro vaši firmu, projekt nebo organizaci. Bez šablon, s administrací, ve které si všechno upravíte sami, a s pevnou cenou předem.',
+  closingTitle: 'Pojďme to probrat',
+  closingText:
+    'Úvodní konzultace trvá 30 minut a je zdarma. Řeknu vám, co bude váš web potřebovat, kolik to bude stát a kdy to stihneme.',
 }
 
 export const ABOUT = {
@@ -73,12 +82,15 @@ export const WEB_SERVICE = {
   faqQuestions: ['Kolik stojí web na míru?', 'Jak dlouho trvá výroba webu?', 'Budu si moct web upravovat sám?'],
 }
 
+/** Nadpis přednášek před vlastní stránkou /prednasky. */
+export const LECTURE_HEADLINE_PREV = 'Přednášky o bezpečnosti na internetu, phishingu a OSINT'
+
 export const LECTURE_SERVICE = {
   title: 'Přednášky o bezpečnosti na internetu',
   slug: 'prednasky-bezpecnost-na-internetu',
   segment: 'bezpecnost' as const,
   order: 2,
-  headline: 'Přednášky o bezpečnosti na internetu, phishingu a OSINT',
+  headline: 'Lidi, které *nenapálí.*',
   intro:
     'Ukážu, jak útočníci doopravdy pracují: jak vypadá phishingový útok, co všechno o vás nebo o firmě dohledají z veřejných zdrojů (OSINT) a jak se proti tomu bránit. Srozumitelně, na skutečných příkladech a bez strašení. Pro firmy, školy, úřady i veřejnost.',
   shortDescription:

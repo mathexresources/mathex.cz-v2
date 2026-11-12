@@ -39,6 +39,19 @@ export const getServices = cached(async () => {
   return res.docs
 }, 'services')
 
+/** Služba „přednášky“ – zobrazuje se na vlastní stránce /prednasky. */
+export const getLectureService = cached(async () => {
+  const payload = await getPayloadClient()
+  const res = await payload.find({
+    collection: 'services',
+    where: { segment: { equals: 'bezpecnost' } },
+    sort: 'order',
+    limit: 1,
+    depth: 2,
+  })
+  return res.docs[0] ?? null
+}, 'lecture-service')
+
 export const getServiceBySlug = cached(async (slug: string) => {
   const payload = await getPayloadClient()
   const res = await payload.find({
@@ -187,7 +200,7 @@ export const getSitemapEntries = cached(async () => {
   const pick = { slug: true, updatedAt: true } as const
   const [posts, services, projects, pages, categories] = await Promise.all([
     payload.find({ collection: 'posts', where: { _status: { equals: 'published' } }, limit: 1000, depth: 0, select: pick, overrideAccess: false }),
-    payload.find({ collection: 'services', limit: 100, depth: 0, select: pick }),
+    payload.find({ collection: 'services', limit: 100, depth: 0, select: { ...pick, segment: true } }),
     payload.find({ collection: 'projects', limit: 200, depth: 0, select: pick }),
     payload.find({ collection: 'pages', where: { _status: { equals: 'published' } }, limit: 100, depth: 0, select: pick, overrideAccess: false }),
     payload.find({ collection: 'categories', limit: 100, depth: 0, select: pick }),

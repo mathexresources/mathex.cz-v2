@@ -4,7 +4,7 @@ const PAGES = [
   '/',
   '/sluzby',
   '/sluzby/weby-na-miru',
-  '/sluzby/prednasky-bezpecnost-na-internetu',
+  '/prednasky',
   '/portfolio',
   '/portfolio/bistro-na-rohu',
   '/cenik',
@@ -62,7 +62,8 @@ test('strukturovaná data jsou platný JSON', async ({ page }) => {
 
 test('sitemap, robots, RSS a obrázek pro sdílení', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text()
-  expect(sitemap).toContain('/sluzby/prednasky-bezpecnost-na-internetu')
+  expect(sitemap).toContain('/prednasky<')
+  expect(sitemap).not.toContain('/sluzby/prednasky-bezpecnost-na-internetu')
   expect(sitemap).toContain('/blog/jak-poznat-podvodny-email')
 
   // localhost se nesmí indexovat
@@ -127,21 +128,40 @@ test('mobil: lepicí lišta se Zavolat a Rezervovat', async ({ browser }) => {
   await page.close()
 })
 
-test('přednášky: stránka, ceník podle domluvy a předvyplněná poptávka', async ({ page }) => {
-  await page.goto('/sluzby/prednasky-bezpecnost-na-internetu')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('phishingu a OSINT')
+test('přednášky mají vlastní stránku, úvod a ceník jsou jen o webech', async ({ page, request }) => {
+  // stará adresa trvale přesměruje
+  const old = await request.get('/sluzby/prednasky-bezpecnost-na-internetu', { maxRedirects: 0 })
+  expect([301, 308]).toContain(old.status())
+  expect(old.headers()['location']).toMatch(/\/prednasky$/)
+
+  await page.goto('/prednasky')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lidi, které nenapálí.')
   await expect(page.getByText('OSINT – co o vás ví internet')).toBeVisible()
   await expect(page.getByText('Délka i cena jsou podle domluvy').first()).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Hlavní navigace' }).getByRole('link', { name: 'Přednášky' })).toHaveAttribute('aria-current', 'page')
 
   await page.getByRole('link', { name: 'Domluvit přednášku' }).first().click()
   await expect(page).toHaveURL(/\/kontakt\?tema=prednaska/)
   await expect(page.getByRole('radio', { name: 'Přednáška' })).toBeChecked()
   await expect(page.getByLabel(/Pro koho a kolik lidí/)).toBeVisible()
 
+  // úvodní stránka a ceník jsou o webech
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).not.toContainText('nenapálí')
+  await expect(page.getByRole('main').getByRole('link', { name: 'Domluvit přednášku' })).toHaveCount(0)
   await page.goto('/cenik')
-  await expect(page.getByRole('heading', { name: 'Přednášky o bezpečnosti' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Přednášky o bezpečnosti' })).toHaveCount(0)
+  await expect(page.getByRole('main').getByRole('link', { name: 'Přednášky', exact: true })).toBeVisible()
 
-  // Na stránce webů tlačítko na přednášku není
   await page.goto('/sluzby/weby-na-miru')
   await expect(page.getByRole('link', { name: 'Domluvit přednášku' })).toHaveCount(0)
+})
+
+test('tmavý režim podle systému', async ({ browser }) => {
+  const ctx = await browser.newContext({ colorScheme: 'dark' })
+  const page = await ctx.newPage()
+  await page.goto('/')
+  const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
+  expect(bg).toBe('rgb(13, 13, 13)')
+  await ctx.close()
 })

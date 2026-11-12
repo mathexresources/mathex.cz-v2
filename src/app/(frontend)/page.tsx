@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { AccentText, plainText } from '@/components/AccentText'
+import { isLectureService } from '@/lib/segments'
 import { ClosingCta } from '@/components/ClosingCta'
 import { FaqList } from '@/components/FaqList'
 import { JsonLd } from '@/components/JsonLd'
@@ -35,15 +36,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [home, site, services, projects, packages, testimonials, faqs] = await Promise.all([
+  const [home, site, services, projects, packages, testimonials, allFaqs] = await Promise.all([
     getHomePage(),
     getSiteSettings(),
     getServices(),
     getProjects({ featured: true }),
     getPackages(),
     getTestimonials(3),
-    getFaqs({ onlyFaqPage: true, limit: 5 }),
+    getFaqs({ onlyFaqPage: true, limit: 12 }),
   ])
+  // Úvodní stránka je o webech – přednášky mají vlastní stránku i otázky
+  const webServices = services.filter((s) => !isLectureService(s))
+  const faqs = allFaqs.filter((f) => f.topic !== 'prednasky').slice(0, 5)
 
   return (
     <>
@@ -61,18 +65,18 @@ export default async function HomePage() {
             <Link href="/rezervace" className="btn btn-primary">
               Rezervovat konzultaci zdarma
             </Link>
-            <Link href="/sluzby/prednasky-bezpecnost-na-internetu" className="btn btn-secondary">
-              Přednášky o bezpečnosti
+            <Link href="#prace" className="btn btn-secondary">
+              Ukázky prací
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Pro koho */}
-      {services.length > 0 && (
+      {/* Webové služby (přednášky mají vlastní stránku) – sekce dává smysl až od dvou */}
+      {webServices.length > 1 && (
         <Section id="sluzby" title="Co dělám">
           <ul>
-            {services.map((s) => (
+            {webServices.map((s) => (
               <li key={s.id} className="group relative border-b border-ink">
                 <div className="grid gap-2 py-7 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-end md:gap-12">
                   <h3 className="text-[clamp(1.875rem,1rem+3vw,3.25rem)] font-black leading-[0.95] tracking-[-0.03em] transition-colors group-hover:text-tape">
@@ -124,7 +128,7 @@ export default async function HomePage() {
         <Section
           id="cenik"
           title="Kolik stojí web"
-          intro="Pevná cena předem, žádné hodinovky. Doménu, hosting i kód máte na sebe, nic vám nedržím jako rukojmí. Přednášky naceňuji podle domluvy."
+          intro="Pevná cena předem, žádné hodinovky. Doménu, hosting i kód máte na sebe, nic vám nedržím jako rukojmí."
           link={{ href: '/cenik', label: 'Podrobný ceník' }}
         >
           <PackageList packages={packages} />

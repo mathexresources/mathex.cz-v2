@@ -11,7 +11,7 @@ export function ClosingCta({
 }) {
   return (
     <section className="container-site mt-28" aria-labelledby="cta-title">
-      <div className="grid gap-8 bg-tape px-6 py-12 text-ink sm:px-10 md:grid-cols-[1.4fr_1fr] md:items-end md:py-16">
+      <div className="grid gap-8 bg-tape px-6 py-12 text-black sm:px-10 md:grid-cols-[1.4fr_1fr] md:items-end md:py-16">
         <div>
           <h2 id="cta-title" className="max-w-[16ch] text-[clamp(2.25rem,1.2rem+3.6vw,4.5rem)] leading-[1]">
             {title}
@@ -19,7 +19,7 @@ export function ClosingCta({
           <p className="mt-5 max-w-[52ch] text-[1.125rem]">{text}</p>
         </div>
         <div className="flex flex-col gap-3 md:items-end">
-          <Link href="/rezervace" className="btn w-full border-ink bg-ink text-paper hover:bg-paper hover:text-ink md:w-auto">
+          <Link href="/rezervace" className="btn w-full border-black bg-black text-white hover:bg-white hover:text-black md:w-auto">
             Vybrat termín konzultace
           </Link>
           {phone && (

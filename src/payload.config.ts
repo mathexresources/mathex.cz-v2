@@ -42,7 +42,8 @@ const urlFor = (collection: string | undefined, slug: string | undefined) => {
     case 'posts':
       return `${siteUrl}/blog/${slug}`
     case 'services':
-      return `${siteUrl}/sluzby/${slug}`
+      // přednášky mají vlastní stránku
+      return slug === 'prednasky-bezpecnost-na-internetu' ? `${siteUrl}/prednasky` : `${siteUrl}/sluzby/${slug}`
     case 'projects':
       return `${siteUrl}/portfolio/${slug}`
     default:

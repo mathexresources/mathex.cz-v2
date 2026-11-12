@@ -15,7 +15,7 @@ export const HomePage: GlobalConfig = {
       label: 'Hlavní nadpis',
       type: 'textarea',
       required: true,
-      defaultValue: 'Weby, které *nezdržují.* A lidi, které nenapálí.',
+      defaultValue: 'Weby, které *nezdržují.*',
       admin: { description: 'Text mezi hvězdičkami se zobrazí oranžově, např. Weby, které *nezdržují.*' },
     },
     {
@@ -24,7 +24,7 @@ export const HomePage: GlobalConfig = {
       type: 'textarea',
       required: true,
       defaultValue:
-        'Navrhnu a naprogramuju rychlý a bezpečný web na míru. Na přednáškách ukazuji, jak fungují phishingové útoky a co o vás prozradí internet.',
+        'Navrhnu a naprogramuju rychlý a bezpečný web pro vaši firmu, projekt nebo organizaci. Bez šablon, s administrací, ve které si všechno upravíte sami, a s pevnou cenou předem.',
     },
     {
       name: 'process',
@@ -48,7 +48,7 @@ export const HomePage: GlobalConfig = {
       label: 'Text výzvy',
       type: 'textarea',
       defaultValue:
-        'Úvodní konzultace trvá 30 minut a je zdarma. Řeknu vám, co to obnáší, kolik to stojí a kdy to stihneme.',
+        'Úvodní konzultace trvá 30 minut a je zdarma. Řeknu vám, co bude váš web potřebovat, kolik to bude stát a kdy to stihneme.',
     },
   ],
 }

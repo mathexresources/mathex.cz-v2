@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 import { getSitemapEntries } from '@/lib/data'
+import { serviceHref } from '@/lib/segments'
 import { absoluteUrl } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
@@ -24,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...fixed,
-    ...services.map((s) => ({ url: absoluteUrl(`/sluzby/${s.slug}`), lastModified: s.updatedAt, priority: 0.9 })),
+    ...services.map((s) => ({ url: absoluteUrl(serviceHref(s)), lastModified: s.updatedAt, priority: 0.9 })),
     ...projects.map((p) => ({ url: absoluteUrl(`/portfolio/${p.slug}`), lastModified: p.updatedAt, priority: 0.6 })),
     ...posts.map((p) => ({ url: absoluteUrl(`/blog/${p.slug}`), lastModified: p.updatedAt, priority: 0.7 })),
     ...categories.map((c) => ({ url: absoluteUrl(`/blog/kategorie/${c.slug}`), lastModified: c.updatedAt, priority: 0.4 })),

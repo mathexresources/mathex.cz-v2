@@ -123,7 +123,7 @@ export function articleSchema(post: Post) {
   }
 }
 
-export function serviceSchema(service: Service, packages: Package[]) {
+export function serviceSchema(service: Service, packages: Package[], path = `/sluzby/${service.slug}`) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -132,7 +132,7 @@ export function serviceSchema(service: Service, packages: Package[]) {
     serviceType: service.segment === 'bezpecnost' ? 'Přednášky a školení o bezpečnosti na internetu' : 'Tvorba webových stránek',
     provider: { '@id': ORG_ID },
     areaServed: { '@type': 'Country', name: 'Česko' },
-    url: absoluteUrl(`/sluzby/${service.slug}`),
+    url: absoluteUrl(path),
     offers: packages.map((p) => ({
       '@type': 'Offer',
       name: p.name,

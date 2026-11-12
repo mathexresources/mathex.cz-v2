@@ -15,3 +15,9 @@ export const segmentLabel = (value?: string | null) =>
 
 /** Která kategorie ceníku patří ke službě daného oboru. */
 export const packageCategoryFor = (segment?: string | null) => (segment === 'bezpecnost' ? 'prednasky' : 'web')
+
+/** Přednášky mají vlastní stránku /prednasky, ostatní služby /sluzby/<slug>. */
+export const LECTURES_PATH = '/prednasky'
+export const isLectureService = (s: { segment?: string | null }) => s.segment === 'bezpecnost'
+export const serviceHref = (s: { slug?: string | null; segment?: string | null }) =>
+  isLectureService(s) ? LECTURES_PATH : `/sluzby/${s.slug}`

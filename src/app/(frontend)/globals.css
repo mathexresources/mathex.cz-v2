@@ -12,6 +12,9 @@
   tužka     #5E5E5E  vedlejší text
   linka     #E2E2E0  jemné oddělovače (hlavní oddělovače jsou černé)
   oranžová  #FF3D00  zvýraznění, focus, aktivní stav – střídmě
+
+  Tmavý režim (podle systému): stejný plakát, jen obrácený – černé pozadí,
+  téměř bílý text, oranžová o kousek světlejší kvůli kontrastu.
 */
 
 @theme {
@@ -32,11 +35,25 @@
   --container-site: 80rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #0d0d0d;
+    --color-surface: #1a1a1a;
+    --color-ink: #f4f4f2;
+    --color-pencil: #a8a8a4;
+    --color-line: #2e2e2c;
+    --color-tape: #ff5a26;
+    --color-on-tape: #000000;
+    --color-danger: #ff6b6b;
+    --color-ok: #5fd08a;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 5rem;
-    color-scheme: light;
+    color-scheme: light dark;
   }
   body {
     background: var(--color-paper);

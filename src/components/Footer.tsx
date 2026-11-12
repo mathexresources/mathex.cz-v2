@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { serviceHref } from '@/lib/segments'
+
 import type { Page, Service, SiteSetting } from '@/payload-types'
 
 import { Wordmark } from './Wordmark'
@@ -35,7 +37,7 @@ export function Footer({ site, services, pages }: Props) {
         <FooterList title="Služby">
           {services.map((s) => (
             <li key={s.slug}>
-              <Link href={`/sluzby/${s.slug}`}>{s.title}</Link>
+              <Link href={serviceHref(s)}>{s.title}</Link>
             </li>
           ))}
           <li>

@@ -10,6 +10,7 @@ import { RichText } from '@/components/RichText'
 import { getPostBySlug, getPosts, getSiteSettings } from '@/lib/data'
 import { pluralMinutes, readingMinutes } from '@/lib/format'
 import { articleSchema } from '@/lib/schema'
+import { serviceHref } from '@/lib/segments'
 import { buildMetadata } from '@/lib/seo'
 import { formatFullDate } from '@/lib/time'
 import type { Category, Service, User } from '@/payload-types'
@@ -111,7 +112,7 @@ export default async function PostPage({ params }: Props) {
               Vybrat termín
             </Link>
             {service && (
-              <Link href={`/sluzby/${service.slug}`} className="btn border-paper text-paper hover:bg-paper hover:text-ink">
+              <Link href={serviceHref(service)} className="btn border-paper text-paper hover:bg-paper hover:text-ink">
                 {service.title}
               </Link>
             )}

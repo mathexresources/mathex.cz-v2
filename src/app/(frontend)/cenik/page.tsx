@@ -13,7 +13,7 @@ import { buildMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = buildMetadata({
   title: 'Ceník tvorby webu',
-  description: 'Kolik stojí web na míru. Pevné ceny, jasné termíny, žádné skryté poplatky. Přednášky o bezpečnosti podle domluvy.',
+  description: 'Kolik stojí web na míru. Pevné ceny, jasné termíny, žádné skryté poplatky.',
   path: '/cenik',
 })
 
@@ -29,9 +29,8 @@ const ALWAYS_INCLUDED = [
 ]
 
 export default async function PricingPage() {
-  const [packages, lecturePackages, faqs, site] = await Promise.all([
+  const [packages, faqs, site] = await Promise.all([
     getPackages('web'),
-    getPackages('prednasky'),
     getFaqs(),
     getSiteSettings(),
   ])
@@ -49,18 +48,14 @@ export default async function PricingPage() {
 
       <div className="container-site mt-16">
         <PackageList packages={packages} />
+        <p className="ui mt-6 text-[1rem] text-pencil">
+          Hledáte cenu přednášky o bezpečnosti? Ta je podle domluvy, víc na stránce{' '}
+          <Link href="/prednasky" className="font-semibold text-ink underline decoration-2 underline-offset-4">
+            Přednášky
+          </Link>
+          .
+        </p>
       </div>
-
-      <Section id="prednasky" title="Přednášky o bezpečnosti">
-        {lecturePackages.length > 0 ? (
-          <PackageList packages={lecturePackages} />
-        ) : (
-          <p className="max-w-[60ch] text-pencil">
-            Délka i cena přednášky jsou podle domluvy.{' '}
-            <Link href="/kontakt?tema=prednaska">Napište mi, co potřebujete</Link>, a pošlu nabídku.
-          </p>
-        )}
-      </Section>
 
       <Section id="vzdy" title="V každém webu">
         <ul className="ui grid gap-x-10 border-t border-line text-[1.05rem] sm:grid-cols-2">
@@ -84,7 +79,7 @@ export default async function PricingPage() {
         </Section>
       )}
 
-      <JsonLd data={offerCatalogSchema([...packages, ...lecturePackages])} />
+      <JsonLd data={offerCatalogSchema(packages)} />
       <ClosingCta title="Nevíte, co vybrat?" phone={site.phone} />
     </>
   )

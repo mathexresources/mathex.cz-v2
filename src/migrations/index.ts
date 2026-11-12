@@ -3,6 +3,7 @@ import * as migration_20261025_220622_blocked_times_calendar from './20261025_22
 import * as migration_20261025_222302_services_lectures from './20261025_222302_services_lectures';
 import * as migration_20261025_230000_broaden_content from './20261025_230000_broaden_content';
 import * as migration_20261107_120000_poster_home from './20261107_120000_poster_home';
+import * as migration_20261112_220000_split_lectures from './20261112_220000_split_lectures';
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20261107_120000_poster_home.up,
     down: migration_20261107_120000_poster_home.down,
     name: '20261107_120000_poster_home',
+  },
+  {
+    up: migration_20261112_220000_split_lectures.up,
+    down: migration_20261112_220000_split_lectures.down,
+    name: '20261112_220000_split_lectures',
   },
 ];

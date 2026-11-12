@@ -7,6 +7,7 @@ export const NAV = [
   { href: '/sluzby', label: 'Služby' },
   { href: '/portfolio', label: 'Portfolio' },
   { href: '/cenik', label: 'Ceník' },
+  { href: '/prednasky', label: 'Přednášky' },
   { href: '/blog', label: 'Blog' },
   { href: '/o-mne', label: 'O mně' },
   { href: '/kontakt', label: 'Kontakt' },

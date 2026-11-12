@@ -10,7 +10,7 @@ const FONT_PATH = path.join(process.cwd(), 'assets/og-bold.ttf')
 async function loadFonts() {
   try {
     const file = await readFile(FONT_PATH)
-    return [{ name: 'Bricolage', data: new Uint8Array(file).buffer as ArrayBuffer, weight: 700 as const, style: 'normal' as const }]
+    return [{ name: 'Archivo', data: new Uint8Array(file).buffer as ArrayBuffer, weight: 900 as const, style: 'normal' as const }]
   } catch {
     return []
   }
@@ -29,24 +29,21 @@ export async function renderOg({ title, label, brand }: { title: string; label?:
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '72px 80px',
-          background: '#172440',
-          backgroundImage:
-            'linear-gradient(to right, rgba(246,247,244,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(246,247,244,0.07) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          color: '#F6F7F4',
-          fontFamily: 'Bricolage',
+          background: '#FFFFFF',
+          color: '#000000',
+          fontFamily: 'Archivo',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 34 }}>
-          <div style={{ width: 14, height: 34, background: '#F2C12E' }} />
+          <div style={{ width: 14, height: 34, background: '#FF3D00' }} />
           {brand}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {label && <div style={{ fontSize: 30, color: '#F2C12E' }}>{label}</div>}
+          {label && <div style={{ fontSize: 30, color: '#FF3D00' }}>{label}</div>}
           <div
             style={{
-              fontSize: title.length > 60 ? 60 : 76,
-              lineHeight: 1.05,
+              fontSize: title.length > 60 ? 50 : 64,
+              lineHeight: 1.08,
               letterSpacing: '-0.03em',
               maxWidth: 1000,
             }}
@@ -54,7 +51,7 @@ export async function renderOg({ title, label, brand }: { title: string; label?:
             {title}
           </div>
         </div>
-        <div style={{ display: 'flex', height: 8, width: 240, background: '#F2C12E' }} />
+        <div style={{ display: 'flex', height: 10, width: 240, background: '#FF3D00' }} />
       </div>
     ),
     { ...OG_SIZE, fonts: fonts.length ? fonts : undefined },
