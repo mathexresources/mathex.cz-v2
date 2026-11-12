@@ -162,6 +162,6 @@ test('tmavý režim podle systému', async ({ browser }) => {
   const page = await ctx.newPage()
   await page.goto('/')
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
-  expect(bg).toBe('rgb(13, 13, 13)')
+  expect(bg).toBe('rgb(26, 29, 34)')
   await ctx.close()
 })
