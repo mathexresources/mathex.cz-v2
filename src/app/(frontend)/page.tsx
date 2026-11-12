@@ -49,7 +49,7 @@ export default async function HomePage() {
     <>
       {/* Úvod */}
       <section className="container-site pt-12 sm:pt-16 lg:pt-20">
-        <h1 className="text-[clamp(2.75rem,1rem+8.4vw,8.25rem)] leading-[0.98] tracking-[-0.035em] sm:leading-[0.92]">
+        <h1 className="text-[clamp(2.75rem,1rem+8.4vw,8.25rem)] leading-[1.02] tracking-[-0.035em] sm:leading-[0.97]">
           <AccentText text={home.heroTitle} />
         </h1>
         <div className="mt-10 grid gap-8 border-t-[3px] border-ink pt-8 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">

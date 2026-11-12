@@ -5,12 +5,13 @@ export const displayFont = localFont({
   src: './archivo-expanded.woff2',
   weight: '700 900',
   style: 'normal',
-  // Nadpisy jsou hlavní obsah (LCP): když písmo nedorazí do ~100 ms, zůstane
-  // při první návštěvě upravený záložní font a nadpis se už nepřekresluje.
-  display: 'optional',
+  // swap: nadpis se vždy dokreslí širokým písmem (soubor má jen ~25 kB a je v preloadu).
+  // Záložní písmo se záměrně neupravuje na šířku Archiva – roztažený Arial by byl
+  // o třetinu vyšší a řádky obřího nadpisu by se překrývaly.
+  display: 'swap',
   variable: '--font-archivo-expanded',
   fallback: ['Arial Black', 'Arial', 'sans-serif'],
-  adjustFontFallback: 'Arial',
+  adjustFontFallback: false,
 })
 
 /** Archivo v běžné šířce – text a ovládací prvky. */

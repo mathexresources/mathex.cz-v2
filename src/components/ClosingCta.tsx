@@ -13,7 +13,7 @@ export function ClosingCta({
     <section className="container-site mt-28" aria-labelledby="cta-title">
       <div className="grid gap-8 bg-tape px-6 py-12 text-ink sm:px-10 md:grid-cols-[1.4fr_1fr] md:items-end md:py-16">
         <div>
-          <h2 id="cta-title" className="max-w-[16ch] text-[clamp(2.25rem,1.2rem+3.6vw,4.5rem)] leading-[0.95]">
+          <h2 id="cta-title" className="max-w-[16ch] text-[clamp(2.25rem,1.2rem+3.6vw,4.5rem)] leading-[1]">
             {title}
           </h2>
           <p className="mt-5 max-w-[52ch] text-[1.125rem]">{text}</p>
